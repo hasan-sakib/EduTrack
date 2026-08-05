@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
+import { useForm, type Resolver } from "react-hook-form"
 import { Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
@@ -55,7 +55,9 @@ export function UserFormDialog({ open, onOpenChange, userToEdit }: UserFormDialo
   const { data: classes } = useAllClasses()
 
   const form = useForm<UserFormValues>({
-    resolver: zodResolver(isEdit ? updateUserSchema : createUserSchema),
+    resolver: (isEdit
+      ? zodResolver(updateUserSchema)
+      : zodResolver(createUserSchema)) as Resolver<UserFormValues>,
     defaultValues: {
       fullName: "",
       email: "",

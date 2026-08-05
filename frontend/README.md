@@ -1,36 +1,34 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# EduTrack Frontend
 
-## Getting Started
+Next.js 15 (App Router) + TypeScript + Tailwind CSS v4 + shadcn/ui frontend for EduTrack. See the
+[repo root README](../README.md) for the full project overview, Docker setup, and demo accounts.
 
-First, run the development server:
+## Local development
 
 ```bash
+cp .env.example .env.local   # point NEXT_PUBLIC_API_URL at your running backend
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000. Requires the backend API running separately (see `../backend/README` via
+the root README's "Running Without Docker" section, or run the whole stack with `docker compose up`
+from the repo root instead).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `app/` — routes: `(auth)/login`, `(dashboard)/{dashboard,users,classes,subjects,assignments,submissions,settings}`
+- `components/ui/` — shadcn/ui primitives (Radix-based)
+- `components/features/` — page-specific components (forms, dialogs, tables) grouped by resource
+- `components/layout/` — app shell, sidebar nav
+- `lib/api/` — Axios client with auth-refresh interceptor
+- `lib/auth/` — auth context + token storage
+- `lib/schemas/` — Zod schemas + TypeScript types mirroring the backend DTOs, one file per resource
+- `hooks/queries/` — TanStack Query hooks, one file per resource
+- `middleware.ts` — route protection + role gating (reads the access-token cookie)
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `npm run dev` — start the dev server
+- `npm run build` — production build
+- `npm run lint` — ESLint

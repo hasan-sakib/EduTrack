@@ -1,0 +1,70 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-edutrack}
+      POSTGRES_USER: ${POSTGRES_USER:-edutrack}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-edutrack}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-edutrack}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - edutrack
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
+      ConnectionStrings__DefaultConnection: Host=postgres;Port=5432;Database=${POSTGRES_DB:-edutrack};Username=${POSTGRES_USER:-edutrack};Password=${POSTGRES_PASSWORD:-edutrack}
+      Jwt__SecretKey: ${JWT_SECRET_KEY:?JWT_SECRET_KEY must be set in .env}
+      Jwt__Issuer: ${JWT_ISSUER:-EduTrack}
+      Jwt__Audience: ${JWT_AUDIENCE:-EduTrackClient}
+      Cors__AllowedOrigins__0: ${APP_ORIGIN:-http://localhost:8080}
+      UploadsPath: /app/uploads
+    volumes:
+      - uploads:/app/uploads
+    networks:
+      - edutrack
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: /api/v1
+    restart: unless-stopped
+    depends_on:
+      - backend
+    networks:
+      - edutrack
+
+  nginx:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      - frontend
+      - backend
+    ports:
+      - "${APP_PORT:-8080}:80"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    networks:
+      - edutrack
+
+networks:
+  edutrack:
+
+volumes:
+  pgdata:
+  uploads:
