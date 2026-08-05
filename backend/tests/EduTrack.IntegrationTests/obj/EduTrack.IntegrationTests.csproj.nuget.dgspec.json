@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/src/tests/EduTrack.IntegrationTests/EduTrack.IntegrationTests.csproj": {}
+    "/Users/sakib/Projects/EduTrack/backend/tests/EduTrack.IntegrationTests/EduTrack.IntegrationTests.csproj": {}
   },
   "projects": {
-    "/src/src/EduTrack.Api/EduTrack.Api.csproj": {
+    "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Api/EduTrack.Api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/src/src/EduTrack.Api/EduTrack.Api.csproj",
+        "projectUniqueName": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Api/EduTrack.Api.csproj",
         "projectName": "EduTrack.Api",
-        "projectPath": "/src/src/EduTrack.Api/EduTrack.Api.csproj",
-        "packagesPath": "/root/.nuget/packages/",
-        "outputPath": "/src/src/EduTrack.Api/obj/",
+        "projectPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Api/EduTrack.Api.csproj",
+        "packagesPath": "/Users/sakib/.nuget/packages/",
+        "outputPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Api/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/root/.nuget/NuGet/NuGet.Config"
+          "/Users/sakib/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -24,16 +24,17 @@
         },
         "frameworks": {
           "net9.0": {
+            "framework": "net9.0",
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/src/src/EduTrack.Application/EduTrack.Application.csproj": {
-                "projectPath": "/src/src/EduTrack.Application/EduTrack.Application.csproj"
+              "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Application/EduTrack.Application.csproj": {
+                "projectPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Application/EduTrack.Application.csproj"
               },
-              "/src/src/EduTrack.Infrastructure/EduTrack.Infrastructure.csproj": {
-                "projectPath": "/src/src/EduTrack.Infrastructure/EduTrack.Infrastructure.csproj"
+              "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Infrastructure/EduTrack.Infrastructure.csproj": {
+                "projectPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Infrastructure/EduTrack.Infrastructure.csproj"
               },
-              "/src/src/EduTrack.Persistence/EduTrack.Persistence.csproj": {
-                "projectPath": "/src/src/EduTrack.Persistence/EduTrack.Persistence.csproj"
+              "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Persistence/EduTrack.Persistence.csproj": {
+                "projectPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Persistence/EduTrack.Persistence.csproj"
               }
             }
           }
@@ -48,10 +49,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.300"
       },
       "frameworks": {
         "net9.0": {
+          "framework": "net9.0",
           "targetAlias": "net9.0",
           "dependencies": {
             "Microsoft.EntityFrameworkCore.Design": {
@@ -80,6 +82,20 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.18, 9.0.18]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Host.osx-arm64",
+              "version": "[9.0.18, 9.0.18]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.18, 9.0.18]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.AspNetCore.App": {
               "privateAssets": "none"
@@ -88,21 +104,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.316/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "/src/src/EduTrack.Application/EduTrack.Application.csproj": {
+    "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Application/EduTrack.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/src/src/EduTrack.Application/EduTrack.Application.csproj",
+        "projectUniqueName": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Application/EduTrack.Application.csproj",
         "projectName": "EduTrack.Application",
-        "projectPath": "/src/src/EduTrack.Application/EduTrack.Application.csproj",
-        "packagesPath": "/root/.nuget/packages/",
-        "outputPath": "/src/src/EduTrack.Application/obj/",
+        "projectPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Application/EduTrack.Application.csproj",
+        "packagesPath": "/Users/sakib/.nuget/packages/",
+        "outputPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Application/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/root/.nuget/NuGet/NuGet.Config"
+          "/Users/sakib/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -112,10 +128,11 @@
         },
         "frameworks": {
           "net9.0": {
+            "framework": "net9.0",
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/src/src/EduTrack.Domain/EduTrack.Domain.csproj": {
-                "projectPath": "/src/src/EduTrack.Domain/EduTrack.Domain.csproj"
+              "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/EduTrack.Domain.csproj": {
+                "projectPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/EduTrack.Domain.csproj"
               }
             }
           }
@@ -130,10 +147,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.300"
       },
       "frameworks": {
         "net9.0": {
+          "framework": "net9.0",
           "targetAlias": "net9.0",
           "dependencies": {
             "AutoMapper": {
@@ -168,26 +186,36 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.18, 9.0.18]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.18, 9.0.18]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.316/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "/src/src/EduTrack.Domain/EduTrack.Domain.csproj": {
+    "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/EduTrack.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/src/src/EduTrack.Domain/EduTrack.Domain.csproj",
+        "projectUniqueName": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/EduTrack.Domain.csproj",
         "projectName": "EduTrack.Domain",
-        "projectPath": "/src/src/EduTrack.Domain/EduTrack.Domain.csproj",
-        "packagesPath": "/root/.nuget/packages/",
-        "outputPath": "/src/src/EduTrack.Domain/obj/",
+        "projectPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/EduTrack.Domain.csproj",
+        "packagesPath": "/Users/sakib/.nuget/packages/",
+        "outputPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/root/.nuget/NuGet/NuGet.Config"
+          "/Users/sakib/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -197,6 +225,7 @@
         },
         "frameworks": {
           "net9.0": {
+            "framework": "net9.0",
             "targetAlias": "net9.0",
             "projectReferences": {}
           }
@@ -211,10 +240,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.300"
       },
       "frameworks": {
         "net9.0": {
+          "framework": "net9.0",
           "targetAlias": "net9.0",
           "imports": [
             "net461",
@@ -227,26 +257,36 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.18, 9.0.18]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.18, 9.0.18]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.316/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "/src/src/EduTrack.Infrastructure/EduTrack.Infrastructure.csproj": {
+    "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Infrastructure/EduTrack.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/src/src/EduTrack.Infrastructure/EduTrack.Infrastructure.csproj",
+        "projectUniqueName": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Infrastructure/EduTrack.Infrastructure.csproj",
         "projectName": "EduTrack.Infrastructure",
-        "projectPath": "/src/src/EduTrack.Infrastructure/EduTrack.Infrastructure.csproj",
-        "packagesPath": "/root/.nuget/packages/",
-        "outputPath": "/src/src/EduTrack.Infrastructure/obj/",
+        "projectPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Infrastructure/EduTrack.Infrastructure.csproj",
+        "packagesPath": "/Users/sakib/.nuget/packages/",
+        "outputPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Infrastructure/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/root/.nuget/NuGet/NuGet.Config"
+          "/Users/sakib/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -256,10 +296,11 @@
         },
         "frameworks": {
           "net9.0": {
+            "framework": "net9.0",
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/src/src/EduTrack.Application/EduTrack.Application.csproj": {
-                "projectPath": "/src/src/EduTrack.Application/EduTrack.Application.csproj"
+              "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Application/EduTrack.Application.csproj": {
+                "projectPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Application/EduTrack.Application.csproj"
               }
             }
           }
@@ -274,10 +315,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.300"
       },
       "frameworks": {
         "net9.0": {
+          "framework": "net9.0",
           "targetAlias": "net9.0",
           "dependencies": {
             "BCrypt.Net-Next": {
@@ -316,26 +358,36 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.18, 9.0.18]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.18, 9.0.18]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.316/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "/src/src/EduTrack.Persistence/EduTrack.Persistence.csproj": {
+    "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Persistence/EduTrack.Persistence.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/src/src/EduTrack.Persistence/EduTrack.Persistence.csproj",
+        "projectUniqueName": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Persistence/EduTrack.Persistence.csproj",
         "projectName": "EduTrack.Persistence",
-        "projectPath": "/src/src/EduTrack.Persistence/EduTrack.Persistence.csproj",
-        "packagesPath": "/root/.nuget/packages/",
-        "outputPath": "/src/src/EduTrack.Persistence/obj/",
+        "projectPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Persistence/EduTrack.Persistence.csproj",
+        "packagesPath": "/Users/sakib/.nuget/packages/",
+        "outputPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Persistence/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/root/.nuget/NuGet/NuGet.Config"
+          "/Users/sakib/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -345,10 +397,11 @@
         },
         "frameworks": {
           "net9.0": {
+            "framework": "net9.0",
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/src/src/EduTrack.Application/EduTrack.Application.csproj": {
-                "projectPath": "/src/src/EduTrack.Application/EduTrack.Application.csproj"
+              "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Application/EduTrack.Application.csproj": {
+                "projectPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Application/EduTrack.Application.csproj"
               }
             }
           }
@@ -363,10 +416,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.300"
       },
       "frameworks": {
         "net9.0": {
+          "framework": "net9.0",
           "targetAlias": "net9.0",
           "dependencies": {
             "Microsoft.EntityFrameworkCore": {
@@ -403,26 +457,36 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.18, 9.0.18]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.18, 9.0.18]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.316/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "/src/tests/EduTrack.IntegrationTests/EduTrack.IntegrationTests.csproj": {
+    "/Users/sakib/Projects/EduTrack/backend/tests/EduTrack.IntegrationTests/EduTrack.IntegrationTests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/src/tests/EduTrack.IntegrationTests/EduTrack.IntegrationTests.csproj",
+        "projectUniqueName": "/Users/sakib/Projects/EduTrack/backend/tests/EduTrack.IntegrationTests/EduTrack.IntegrationTests.csproj",
         "projectName": "EduTrack.IntegrationTests",
-        "projectPath": "/src/tests/EduTrack.IntegrationTests/EduTrack.IntegrationTests.csproj",
-        "packagesPath": "/root/.nuget/packages/",
-        "outputPath": "/src/tests/EduTrack.IntegrationTests/obj/",
+        "projectPath": "/Users/sakib/Projects/EduTrack/backend/tests/EduTrack.IntegrationTests/EduTrack.IntegrationTests.csproj",
+        "packagesPath": "/Users/sakib/.nuget/packages/",
+        "outputPath": "/Users/sakib/Projects/EduTrack/backend/tests/EduTrack.IntegrationTests/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/root/.nuget/NuGet/NuGet.Config"
+          "/Users/sakib/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net9.0"
@@ -432,10 +496,11 @@
         },
         "frameworks": {
           "net9.0": {
+            "framework": "net9.0",
             "targetAlias": "net9.0",
             "projectReferences": {
-              "/src/src/EduTrack.Api/EduTrack.Api.csproj": {
-                "projectPath": "/src/src/EduTrack.Api/EduTrack.Api.csproj"
+              "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Api/EduTrack.Api.csproj": {
+                "projectPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Api/EduTrack.Api.csproj"
               }
             }
           }
@@ -450,10 +515,11 @@
           "auditLevel": "low",
           "auditMode": "direct"
         },
-        "SdkAnalysisLevel": "9.0.300"
+        "SdkAnalysisLevel": "10.0.300"
       },
       "frameworks": {
         "net9.0": {
+          "framework": "net9.0",
           "targetAlias": "net9.0",
           "dependencies": {
             "FluentAssertions": {
@@ -494,12 +560,22 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
+          "downloadDependencies": [
+            {
+              "name": "Microsoft.AspNetCore.App.Ref",
+              "version": "[9.0.18, 9.0.18]"
+            },
+            {
+              "name": "Microsoft.NETCore.App.Ref",
+              "version": "[9.0.18, 9.0.18]"
+            }
+          ],
           "frameworkReferences": {
             "Microsoft.NETCore.App": {
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.316/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.302/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

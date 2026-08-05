@@ -5,14 +5,19 @@ import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { ArrowLeft, Loader2 } from "lucide-react"
+import { ArrowLeft, Check, Loader2 } from "lucide-react"
 import { format } from "date-fns"
 import { toast } from "sonner"
+import { motion } from "framer-motion"
 
 import { apiClient } from "@/lib/api/client"
 import { useAuth } from "@/lib/auth/auth-context"
 import { useAssignment } from "@/hooks/queries/use-assignments"
 import { getErrorMessage } from "@/lib/api/error"
+import { getDeadlineInfo } from "@/lib/deadline"
+import { assignmentStatusTone, submissionStatusTone } from "@/lib/status-styles"
+import { fadeInUp } from "@/lib/motion"
+import { cn } from "@/lib/utils"
 import { AssignmentStatus, assignmentStatusLabels } from "@/lib/schemas/assignments"
 import {
   SubmissionStatus,
@@ -22,22 +27,17 @@ import {
   type SubmissionDto,
 } from "@/lib/schemas/submissions"
 
+import { PageHeader } from "@/components/features/page-header"
 import { ErrorState } from "@/components/features/error-state"
+import { StatusBadge } from "@/components/features/status-badge"
 import { AssignmentFormDialog } from "@/components/features/assignments/assignment-form-dialog"
 
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Separator } from "@/components/ui/separator"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
-
-const statusBadgeVariant: Record<number, "secondary" | "default" | "outline"> = {
-  [AssignmentStatus.Draft]: "secondary",
-  [AssignmentStatus.Published]: "default",
-  [AssignmentStatus.Closed]: "outline",
-}
 
 export default function AssignmentDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = React.use(params)
@@ -47,7 +47,7 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
 
   const [editOpen, setEditOpen] = React.useState(false)
 
-  const { data: assignment, isLoading, isError } = useAssignment(id)
+  const { data: assignment, isLoading, isError, refetch } = useAssignment(id)
 
   if (isLoading) {
     return (
@@ -68,80 +68,128 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
           <ArrowLeft className="size-4" />
           Back to Assignments
         </Link>
-        <ErrorState message="This assignment is not available to you." />
+        <ErrorState message="This assignment is not available to you." onRetry={() => refetch()} />
       </div>
     )
   }
 
+  const deadline = getDeadlineInfo(assignment.dueDate, assignment.status)
+
   return (
     <div>
-      <Link
-        href="/assignments"
-        className="mb-4 inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-      >
-        <ArrowLeft className="size-4" />
-        Back to Assignments
-      </Link>
-
-      <Card>
-        <CardHeader className="flex flex-row items-start justify-between gap-4">
-          <div>
-            <CardTitle className="text-xl">{assignment.title}</CardTitle>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {assignment.className} — {assignment.subjectName}
-            </p>
-          </div>
-          <Badge variant={statusBadgeVariant[assignment.status]}>
-            {assignmentStatusLabels[assignment.status]}
-          </Badge>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="whitespace-pre-wrap text-sm">{assignment.description}</p>
-
-          <Separator />
-
-          <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-3">
-            <div>
-              <p className="text-muted-foreground">Teacher</p>
-              <p className="font-medium">{assignment.teacherName}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Due Date</p>
-              <p className="font-medium">{format(new Date(assignment.dueDate), "PPp")}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Max Marks</p>
-              <p className="font-medium">{assignment.maxMarks}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Allow Resubmission</p>
-              <p className="font-medium">{assignment.allowResubmission ? "Yes" : "No"}</p>
-            </div>
-          </div>
-
-          {isTeacher && (
-            <>
-              <Separator />
-              <div className="flex flex-wrap gap-2">
+      <PageHeader
+        title={assignment.title}
+        description={`${assignment.className} — ${assignment.subjectName}`}
+        breadcrumbs={[{ label: "Assignments", href: "/assignments" }, { label: assignment.title }]}
+        action={
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusBadge tone={assignmentStatusTone[assignment.status]}>
+              {assignmentStatusLabels[assignment.status]}
+            </StatusBadge>
+            {deadline && <StatusBadge tone={deadline.tone}>{deadline.label}</StatusBadge>}
+            {isTeacher && (
+              <>
                 <Button variant="outline" onClick={() => setEditOpen(true)}>
                   Edit
                 </Button>
                 <Button variant="outline" asChild>
                   <Link href={`/submissions?assignmentId=${assignment.id}`}>View Submissions</Link>
                 </Button>
+              </>
+            )}
+          </div>
+        }
+      />
+
+      <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
+        <Card className="shadow-sm">
+          <CardContent className="space-y-4 pt-6">
+            <p className="whitespace-pre-wrap text-sm leading-relaxed">{assignment.description}</p>
+
+            <Separator />
+
+            <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
+              <div>
+                <p className="text-muted-foreground">Teacher</p>
+                <p className="font-medium">{assignment.teacherName}</p>
               </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
+              <div>
+                <p className="text-muted-foreground">Due Date</p>
+                <p className="font-medium">{format(new Date(assignment.dueDate), "PPp")}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Max Marks</p>
+                <p className="font-medium">{assignment.maxMarks}</p>
+              </div>
+              <div>
+                <p className="text-muted-foreground">Allow Resubmission</p>
+                <p className="font-medium">{assignment.allowResubmission ? "Yes" : "No"}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {isStudent && assignment.status === AssignmentStatus.Published && (
-        <StudentSubmissionPanel assignmentId={assignment.id} dueDate={assignment.dueDate} maxMarks={assignment.maxMarks} allowResubmission={assignment.allowResubmission} />
+        <StudentSubmissionPanel
+          assignmentId={assignment.id}
+          dueDate={assignment.dueDate}
+          maxMarks={assignment.maxMarks}
+          allowResubmission={assignment.allowResubmission}
+        />
       )}
 
       {isTeacher && (
         <AssignmentFormDialog open={editOpen} onOpenChange={setEditOpen} assignmentToEdit={assignment} />
       )}
+    </div>
+  )
+}
+
+function SubmissionTimeline({ submission }: { submission: SubmissionDto | null | undefined }) {
+  const isGraded = submission?.status === SubmissionStatus.Graded || submission?.status === SubmissionStatus.Returned
+  const steps = [
+    { key: "submitted", label: "Submitted", done: !!submission },
+    {
+      key: "graded",
+      label: submission?.status === SubmissionStatus.Returned ? "Returned" : "Graded",
+      done: !!isGraded,
+    },
+  ]
+
+  return (
+    <div className="mb-5 flex items-center">
+      {steps.map((step, i) => (
+        <React.Fragment key={step.key}>
+          <div className="flex flex-col items-center gap-1.5">
+            <motion.div
+              initial={{ scale: 0.6, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: i * 0.1 }}
+              className={cn(
+                "flex size-7 items-center justify-center rounded-full border-2",
+                step.done ? "border-success bg-success/10 text-success" : "border-muted-foreground/25 text-muted-foreground"
+              )}
+            >
+              {step.done ? <Check className="size-3.5" /> : <span className="size-1.5 rounded-full bg-current" />}
+            </motion.div>
+            <span className={cn("text-xs whitespace-nowrap", step.done ? "font-medium text-foreground" : "text-muted-foreground")}>
+              {step.label}
+            </span>
+          </div>
+          {i < steps.length - 1 && (
+            <div className="mx-2 mb-4 h-0.5 w-16 overflow-hidden rounded-full bg-muted">
+              <motion.div
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: isGraded ? 1 : 0 }}
+                style={{ originX: 0 }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                className="h-full bg-success"
+              />
+            </div>
+          )}
+        </React.Fragment>
+      ))}
     </div>
   )
 }
@@ -207,77 +255,89 @@ function StudentSubmissionPanel({
   const deadlineMissedNoSubmission = !submission && deadlinePassed
 
   return (
-    <Card className="mt-6">
-      <CardHeader>
-        <CardTitle>Your Submission</CardTitle>
-      </CardHeader>
-      <CardContent>
-        {isLoading ? (
-          <Skeleton className="h-24 w-full" />
-        ) : isGraded && submission ? (
-          <div className="space-y-3 text-sm">
-            <div>
-              <p className="text-muted-foreground">Marks</p>
-              <p className="text-lg font-semibold">
-                {submission.marks ?? "—"} / {maxMarks}
-              </p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Feedback</p>
-              <p className="whitespace-pre-wrap">{submission.feedback || "No feedback provided."}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Status</p>
-              <Badge variant="outline">{submissionStatusLabels[submission.status]}</Badge>
-            </div>
-            {submission.gradedByName && (
-              <p className="text-muted-foreground">
-                Graded by {submission.gradedByName}
-                {submission.gradedAt ? ` on ${format(new Date(submission.gradedAt), "PPp")}` : ""}
-              </p>
-            )}
-          </div>
-        ) : deadlineMissedNoSubmission ? (
-          <p className="text-sm text-muted-foreground">The deadline for this assignment has passed.</p>
-        ) : showFreshForm || canResubmit ? (
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="content"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Your answer</FormLabel>
-                    <FormControl>
-                      <Textarea rows={6} placeholder="Write your answer here..." {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" disabled={submitMutation.isPending}>
-                {submitMutation.isPending && <Loader2 className="animate-spin" />}
-                {canResubmit ? "Resubmit" : "Submit"}
-              </Button>
-            </form>
-          </Form>
-        ) : submission ? (
-          <div className="space-y-2 text-sm">
-            <p>
-              Submitted on {format(new Date(submission.submittedAt), "PPp")}
-              {submission.isLate ? " (late)" : ""}.
-            </p>
-            <p className="text-muted-foreground">
-              Your submission is awaiting grading
-              {!allowResubmission
-                ? "; resubmission is not allowed for this assignment."
-                : deadlinePassed
-                  ? "; the due date has passed so it can no longer be changed."
-                  : "."}
-            </p>
-          </div>
-        ) : null}
-      </CardContent>
-    </Card>
+    <motion.div initial="hidden" animate="visible" variants={fadeInUp} transition={{ delay: 0.1 }}>
+      <Card className="mt-6 shadow-sm">
+        <CardHeader>
+          <CardTitle>Your Submission</CardTitle>
+        </CardHeader>
+        <CardContent>
+          {isLoading ? (
+            <Skeleton className="h-24 w-full" />
+          ) : (
+            <>
+              {!deadlineMissedNoSubmission && <SubmissionTimeline submission={submission} />}
+
+              {isGraded && submission ? (
+                <div className="space-y-4 text-sm">
+                  <div className="rounded-lg border bg-muted/30 p-4">
+                    <p className="text-muted-foreground">Marks</p>
+                    <p className="text-2xl font-semibold tracking-tight">
+                      {submission.marks ?? "—"} <span className="text-base font-normal text-muted-foreground">/ {maxMarks}</span>
+                    </p>
+                  </div>
+                  <div>
+                    <p className="mb-1 text-muted-foreground">Feedback</p>
+                    <p className="whitespace-pre-wrap rounded-lg border bg-background p-3">
+                      {submission.feedback || "No feedback provided."}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-muted-foreground">Status</span>
+                    <StatusBadge tone={submissionStatusTone[submission.status]}>
+                      {submissionStatusLabels[submission.status]}
+                    </StatusBadge>
+                  </div>
+                  {submission.gradedByName && (
+                    <p className="text-muted-foreground">
+                      Graded by {submission.gradedByName}
+                      {submission.gradedAt ? ` on ${format(new Date(submission.gradedAt), "PPp")}` : ""}
+                    </p>
+                  )}
+                </div>
+              ) : deadlineMissedNoSubmission ? (
+                <p className="text-sm text-muted-foreground">The deadline for this assignment has passed.</p>
+              ) : showFreshForm || canResubmit ? (
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="content"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Your answer</FormLabel>
+                          <FormControl>
+                            <Textarea rows={6} placeholder="Write your answer here..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <Button type="submit" disabled={submitMutation.isPending}>
+                      {submitMutation.isPending && <Loader2 className="animate-spin" />}
+                      {canResubmit ? "Resubmit" : "Submit"}
+                    </Button>
+                  </form>
+                </Form>
+              ) : submission ? (
+                <div className="space-y-2 text-sm">
+                  <p>
+                    Submitted on {format(new Date(submission.submittedAt), "PPp")}
+                    {submission.isLate ? " (late)" : ""}.
+                  </p>
+                  <p className="text-muted-foreground">
+                    Your submission is awaiting grading
+                    {!allowResubmission
+                      ? "; resubmission is not allowed for this assignment."
+                      : deadlinePassed
+                        ? "; the due date has passed so it can no longer be changed."
+                        : "."}
+                  </p>
+                </div>
+              ) : null}
+            </>
+          )}
+        </CardContent>
+      </Card>
+    </motion.div>
   )
 }

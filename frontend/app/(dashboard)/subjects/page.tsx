@@ -1,13 +1,17 @@
 "use client"
 
 import * as React from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { Plus, MoreHorizontal, BookOpen, Search } from "lucide-react"
 import { toast } from "sonner"
 
 import { useAuth } from "@/lib/auth/auth-context"
 import { useSubjects, useDeleteSubject } from "@/hooks/queries/use-subjects"
 import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { useSortState } from "@/hooks/use-sort-state"
 import { getErrorMessage } from "@/lib/api/error"
+import { activeStatusTone } from "@/lib/status-styles"
+import { fadeIn } from "@/lib/motion"
 import type { SubjectDto } from "@/lib/schemas/subjects"
 
 import { PageHeader } from "@/components/features/page-header"
@@ -16,11 +20,13 @@ import { ErrorState } from "@/components/features/error-state"
 import { PaginationFooter } from "@/components/features/pagination-footer"
 import { ConfirmDeleteDialog } from "@/components/features/confirm-delete-dialog"
 import { SubjectFormDialog } from "@/components/features/subjects/subject-form-dialog"
+import { TableSkeleton } from "@/components/features/table-skeleton"
+import { StatusBadge } from "@/components/features/status-badge"
+import { SortableHead } from "@/components/features/sortable-head"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
   DropdownMenu,
@@ -36,12 +42,13 @@ export default function SubjectsPage() {
   const [page, setPage] = React.useState(1)
   const [search, setSearch] = React.useState("")
   const debouncedSearch = useDebouncedValue(search)
+  const { sortDir, toggleSort } = useSortState("name")
 
   const [formOpen, setFormOpen] = React.useState(false)
   const [editingSubject, setEditingSubject] = React.useState<SubjectDto | null>(null)
   const [deletingSubject, setDeletingSubject] = React.useState<SubjectDto | null>(null)
 
-  const { data, isLoading, isError } = useSubjects({ page, pageSize: 10, search: debouncedSearch })
+  const { data, isLoading, isError, refetch } = useSubjects({ page, pageSize: 10, search: debouncedSearch, sortDir })
   const deleteSubject = useDeleteSubject()
 
   function openCreate() {
@@ -93,64 +100,66 @@ export default function SubjectsPage() {
         />
       </div>
 
-      <div className="rounded-lg border bg-background">
+      <div className="overflow-hidden rounded-lg border bg-background shadow-sm">
         {isError ? (
           <div className="p-6">
-            <ErrorState message="Could not load subjects. Please try again." />
+            <ErrorState message="Could not load subjects. Please try again." onRetry={() => refetch()} />
           </div>
         ) : isLoading ? (
-          <div className="space-y-3 p-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
-            ))}
-          </div>
+          <TableSkeleton columns={isAdmin ? 4 : 3} />
         ) : data && data.items.length > 0 ? (
           <>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Code</TableHead>
-                  <TableHead>Status</TableHead>
-                  {isAdmin && <TableHead className="w-12" />}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.items.map((subject) => (
-                  <TableRow key={subject.id}>
-                    <TableCell className="font-medium">{subject.name}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{subject.code}</Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge variant={subject.isActive ? "default" : "secondary"}>
-                        {subject.isActive ? "Active" : "Inactive"}
-                      </Badge>
-                    </TableCell>
-                    {isAdmin && (
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="size-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onSelect={() => openEdit(subject)}>Edit</DropdownMenuItem>
-                            <DropdownMenuItem
-                              variant="destructive"
-                              onSelect={() => setDeletingSubject(subject)}
-                            >
-                              Deactivate
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <AnimatePresence mode="wait">
+              <motion.div key={page} initial="hidden" animate="visible" variants={fadeIn}>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <SortableHead label="Name" sortKey="name" activeSortKey="name" sortDir={sortDir} onSort={toggleSort} />
+                      <TableHead>Code</TableHead>
+                      <TableHead>Status</TableHead>
+                      {isAdmin && <TableHead className="w-12" />}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.items.map((subject) => (
+                      <TableRow key={subject.id}>
+                        <TableCell className="font-medium">{subject.name}</TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="font-mono text-xs">
+                            {subject.code}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <StatusBadge tone={activeStatusTone[subject.isActive ? "active" : "inactive"]}>
+                            {subject.isActive ? "Active" : "Inactive"}
+                          </StatusBadge>
+                        </TableCell>
+                        {isAdmin && (
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreHorizontal className="size-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onSelect={() => openEdit(subject)}>Edit</DropdownMenuItem>
+                                <DropdownMenuItem
+                                  variant="destructive"
+                                  onSelect={() => setDeletingSubject(subject)}
+                                >
+                                  Deactivate
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </motion.div>
+            </AnimatePresence>
             <PaginationFooter
               page={data.page}
               totalPages={data.totalPages}

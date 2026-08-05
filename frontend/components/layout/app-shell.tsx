@@ -6,6 +6,8 @@ import { GraduationCap, LogOut, Menu, User as UserIcon } from "lucide-react"
 
 import { useAuth } from "@/lib/auth/auth-context"
 import { NavLinks } from "@/components/layout/nav-links"
+import { toneClassName, roleTone } from "@/lib/status-styles"
+import { cn, getInitials } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import {
@@ -19,19 +21,10 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 
-function initials(name: string) {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase()
-}
-
 function Logo() {
   return (
     <div className="flex items-center gap-2 px-2 py-1">
-      <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+      <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
         <GraduationCap className="size-4" />
       </div>
       <span className="text-base font-semibold tracking-tight">EduTrack</span>
@@ -42,6 +35,14 @@ function Logo() {
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { user, logout } = useAuth()
   const [mobileOpen, setMobileOpen] = React.useState(false)
+  const [scrolled, setScrolled] = React.useState(false)
+
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4)
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
 
   if (!user) return null
 
@@ -57,7 +58,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="flex min-h-screen flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex h-16 items-center gap-3 border-b bg-background px-4">
+        <header
+          className={cn(
+            "sticky top-0 z-10 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur transition-shadow duration-200 supports-backdrop-filter:bg-background/75",
+            scrolled && "shadow-sm"
+          )}
+        >
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
               <Button variant="ghost" size="icon" className="md:hidden">
@@ -81,14 +87,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Link>
 
           <div className="ml-auto flex items-center gap-3">
-            <Badge variant="secondary" className="hidden sm:inline-flex">
+            <Badge className={cn("hidden border sm:inline-flex", toneClassName[roleTone[user.role]])}>
               {user.role}
             </Badge>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="gap-2 px-2">
                   <Avatar className="size-7">
-                    <AvatarFallback className="text-xs">{initials(user.fullName)}</AvatarFallback>
+                    <AvatarFallback className="bg-accent text-xs text-accent-foreground">
+                      {getInitials(user.fullName)}
+                    </AvatarFallback>
                   </Avatar>
                   <span className="hidden text-sm font-medium sm:inline">{user.fullName}</span>
                 </Button>

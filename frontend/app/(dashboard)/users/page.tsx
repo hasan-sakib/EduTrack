@@ -1,6 +1,7 @@
 "use client"
 
 import * as React from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { Plus, MoreHorizontal, Users as UsersIcon, Search, GraduationCap } from "lucide-react"
 import { toast } from "sonner"
 
@@ -8,8 +9,12 @@ import { useAuth } from "@/lib/auth/auth-context"
 import { useUsers, useDeleteUser } from "@/hooks/queries/use-users"
 import { useTeacherAssignments, useDeleteTeacherAssignment } from "@/hooks/queries/use-teacher-assignments"
 import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { useSortState } from "@/hooks/use-sort-state"
 import { getErrorMessage } from "@/lib/api/error"
-import { ROLES } from "@/lib/schemas/common"
+import { getInitials } from "@/lib/utils"
+import { activeStatusTone, roleTone } from "@/lib/status-styles"
+import { fadeIn } from "@/lib/motion"
+import { ROLES, type Role } from "@/lib/schemas/common"
 import type { UserDto } from "@/lib/schemas/users"
 import type { TeacherAssignmentDto } from "@/lib/schemas/teacher-assignments"
 
@@ -20,11 +25,13 @@ import { PaginationFooter } from "@/components/features/pagination-footer"
 import { ConfirmDeleteDialog } from "@/components/features/confirm-delete-dialog"
 import { UserFormDialog } from "@/components/features/users/user-form-dialog"
 import { TeacherAssignmentDialog } from "@/components/features/users/teacher-assignment-dialog"
+import { TableSkeleton } from "@/components/features/table-skeleton"
+import { StatusBadge } from "@/components/features/status-badge"
+import { SortableHead } from "@/components/features/sortable-head"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Select,
@@ -71,16 +78,19 @@ function UsersTab() {
   const [search, setSearch] = React.useState("")
   const debouncedSearch = useDebouncedValue(search)
   const [roleFilter, setRoleFilter] = React.useState<string>(ROLE_FILTER_ALL)
+  const { sortBy, sortDir, toggleSort } = useSortState()
 
   const [formOpen, setFormOpen] = React.useState(false)
   const [editingUser, setEditingUser] = React.useState<UserDto | null>(null)
   const [deletingUser, setDeletingUser] = React.useState<UserDto | null>(null)
 
-  const { data, isLoading, isError } = useUsers({
+  const { data, isLoading, isError, refetch } = useUsers({
     page,
     pageSize: 10,
     search: debouncedSearch,
     role: roleFilter === ROLE_FILTER_ALL ? undefined : roleFilter,
+    sortBy,
+    sortDir,
   })
   const deleteUser = useDeleteUser()
 
@@ -150,68 +160,89 @@ function UsersTab() {
         </Select>
       </div>
 
-      <div className="rounded-lg border bg-background">
+      <div className="overflow-hidden rounded-lg border bg-background shadow-sm">
         {isError ? (
           <div className="p-6">
-            <ErrorState message="Could not load users. Please try again." />
+            <ErrorState message="Could not load users. Please try again." onRetry={() => refetch()} />
           </div>
         ) : isLoading ? (
-          <div className="space-y-3 p-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
-            ))}
-          </div>
+          <TableSkeleton columns={isAdmin ? 6 : 5} />
         ) : data && data.items.length > 0 ? (
           <>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Full Name</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Role</TableHead>
-                  <TableHead>Class</TableHead>
-                  <TableHead>Status</TableHead>
-                  {isAdmin && <TableHead className="w-12" />}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.items.map((userItem) => (
-                  <TableRow key={userItem.id}>
-                    <TableCell className="font-medium">{userItem.fullName}</TableCell>
-                    <TableCell className="text-muted-foreground">{userItem.email}</TableCell>
-                    <TableCell>
-                      <Badge variant="outline">{userItem.role}</Badge>
-                    </TableCell>
-                    <TableCell>{userItem.className || "—"}</TableCell>
-                    <TableCell>
-                      <Badge variant={userItem.isActive ? "default" : "secondary"}>
-                        {userItem.isActive ? "Active" : "Inactive"}
-                      </Badge>
-                    </TableCell>
-                    {isAdmin && (
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="size-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onSelect={() => openEdit(userItem)}>Edit</DropdownMenuItem>
-                            <DropdownMenuItem
-                              variant="destructive"
-                              onSelect={() => setDeletingUser(userItem)}
-                            >
-                              Deactivate
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <AnimatePresence mode="wait">
+              <motion.div key={page} initial="hidden" animate="visible" variants={fadeIn}>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <SortableHead
+                        label="Full Name"
+                        sortKey="fullName"
+                        activeSortKey={sortBy}
+                        sortDir={sortDir}
+                        onSort={toggleSort}
+                      />
+                      <SortableHead
+                        label="Email"
+                        sortKey="email"
+                        activeSortKey={sortBy}
+                        sortDir={sortDir}
+                        onSort={toggleSort}
+                      />
+                      <TableHead>Role</TableHead>
+                      <TableHead>Class</TableHead>
+                      <TableHead>Status</TableHead>
+                      {isAdmin && <TableHead className="w-12" />}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.items.map((userItem) => (
+                      <TableRow key={userItem.id}>
+                        <TableCell className="font-medium">
+                          <div className="flex items-center gap-2.5">
+                            <Avatar className="size-7">
+                              <AvatarFallback className="bg-accent text-[11px] text-accent-foreground">
+                                {getInitials(userItem.fullName)}
+                              </AvatarFallback>
+                            </Avatar>
+                            {userItem.fullName}
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{userItem.email}</TableCell>
+                        <TableCell>
+                          <StatusBadge tone={roleTone[userItem.role as Role]}>{userItem.role}</StatusBadge>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{userItem.className || "—"}</TableCell>
+                        <TableCell>
+                          <StatusBadge tone={activeStatusTone[userItem.isActive ? "active" : "inactive"]}>
+                            {userItem.isActive ? "Active" : "Inactive"}
+                          </StatusBadge>
+                        </TableCell>
+                        {isAdmin && (
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreHorizontal className="size-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onSelect={() => openEdit(userItem)}>Edit</DropdownMenuItem>
+                                <DropdownMenuItem
+                                  variant="destructive"
+                                  onSelect={() => setDeletingUser(userItem)}
+                                >
+                                  Deactivate
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </motion.div>
+            </AnimatePresence>
             <PaginationFooter
               page={data.page}
               totalPages={data.totalPages}
@@ -259,7 +290,7 @@ function TeacherAssignmentsTab() {
   const [assignOpen, setAssignOpen] = React.useState(false)
   const [deletingAssignment, setDeletingAssignment] = React.useState<TeacherAssignmentDto | null>(null)
 
-  const { data, isLoading, isError } = useTeacherAssignments({ page, pageSize: 10 })
+  const { data, isLoading, isError, refetch } = useTeacherAssignments({ page, pageSize: 10 })
   const deleteTeacherAssignment = useDeleteTeacherAssignment()
 
   async function confirmDelete() {
@@ -284,17 +315,13 @@ function TeacherAssignmentsTab() {
         </div>
       )}
 
-      <div className="rounded-lg border bg-background">
+      <div className="overflow-hidden rounded-lg border bg-background shadow-sm">
         {isError ? (
           <div className="p-6">
-            <ErrorState message="Could not load teacher assignments. Please try again." />
+            <ErrorState message="Could not load teacher assignments. Please try again." onRetry={() => refetch()} />
           </div>
         ) : isLoading ? (
-          <div className="space-y-3 p-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
-            ))}
-          </div>
+          <TableSkeleton columns={isAdmin ? 4 : 3} />
         ) : data && data.items.length > 0 ? (
           <>
             <Table>

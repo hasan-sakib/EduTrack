@@ -1,12 +1,15 @@
 "use client"
 
 import * as React from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { format } from "date-fns"
-import { History, Search } from "lucide-react"
+import { History, Search, Settings2 } from "lucide-react"
 
 import { useSettings } from "@/hooks/queries/use-settings"
 import { useAuditLogs } from "@/hooks/queries/use-audit-logs"
 import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { auditActionTone } from "@/lib/status-styles"
+import { fadeIn, staggerContainer, fadeInUp } from "@/lib/motion"
 import type { ApplicationSettingDto } from "@/lib/schemas/settings"
 
 import { PageHeader } from "@/components/features/page-header"
@@ -14,6 +17,8 @@ import { EmptyState } from "@/components/features/empty-state"
 import { ErrorState } from "@/components/features/error-state"
 import { PaginationFooter } from "@/components/features/pagination-footer"
 import { SettingEditDialog } from "@/components/features/settings/setting-edit-dialog"
+import { TableSkeleton } from "@/components/features/table-skeleton"
+import { StatusBadge } from "@/components/features/status-badge"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -35,7 +40,7 @@ function settingLabel(key: string): string {
 export default function SettingsPage() {
   const [editingSetting, setEditingSetting] = React.useState<ApplicationSettingDto | null>(null)
 
-  const { data: settings, isLoading: settingsLoading, isError: settingsError } = useSettings()
+  const { data: settings, isLoading: settingsLoading, isError: settingsError, refetch: refetchSettings } = useSettings()
 
   const [page, setPage] = React.useState(1)
   const [search, setSearch] = React.useState("")
@@ -45,6 +50,7 @@ export default function SettingsPage() {
     data: auditData,
     isLoading: auditLoading,
     isError: auditError,
+    refetch: refetchAudit,
   } = useAuditLogs({ page, pageSize: 10, search: debouncedSearch })
 
   return (
@@ -59,32 +65,41 @@ export default function SettingsPage() {
 
         <TabsContent value="general" className="mt-4">
           {settingsError ? (
-            <ErrorState message="Could not load settings. Please try again." />
+            <ErrorState message="Could not load settings. Please try again." onRetry={() => refetchSettings()} />
           ) : settingsLoading ? (
             <div className="space-y-3">
               {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-24 w-full" />
+                <Skeleton key={i} className="h-24 w-full rounded-lg" />
               ))}
             </div>
           ) : (
-            <div className="space-y-3">
+            <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="space-y-3">
               {settings?.map((setting) => (
-                <Card key={setting.id}>
-                  <CardHeader>
-                    <CardTitle>{settingLabel(setting.key)}</CardTitle>
-                    {setting.description && <CardDescription>{setting.description}</CardDescription>}
-                    <CardAction>
-                      <Button variant="outline" size="sm" onClick={() => setEditingSetting(setting)}>
-                        Edit
-                      </Button>
-                    </CardAction>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm font-medium">{setting.value}</p>
-                  </CardContent>
-                </Card>
+                <motion.div key={setting.id} variants={fadeInUp}>
+                  <Card className="shadow-sm">
+                    <CardHeader>
+                      <div className="flex items-center gap-2.5">
+                        <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                          <Settings2 className="size-4" />
+                        </div>
+                        <CardTitle>{settingLabel(setting.key)}</CardTitle>
+                      </div>
+                      {setting.description && (
+                        <CardDescription className="pt-1">{setting.description}</CardDescription>
+                      )}
+                      <CardAction>
+                        <Button variant="outline" size="sm" onClick={() => setEditingSetting(setting)}>
+                          Edit
+                        </Button>
+                      </CardAction>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="rounded-md bg-muted/40 px-3 py-2 font-mono text-sm">{setting.value}</p>
+                    </CardContent>
+                  </Card>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           )}
         </TabsContent>
 
@@ -102,49 +117,51 @@ export default function SettingsPage() {
             />
           </div>
 
-          <div className="rounded-lg border bg-background">
+          <div className="overflow-hidden rounded-lg border bg-background shadow-sm">
             {auditError ? (
               <div className="p-6">
-                <ErrorState message="Could not load audit logs. Please try again." />
+                <ErrorState message="Could not load audit logs. Please try again." onRetry={() => refetchAudit()} />
               </div>
             ) : auditLoading ? (
-              <div className="space-y-3 p-4">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton key={i} className="h-10 w-full" />
-                ))}
-              </div>
+              <TableSkeleton columns={6} />
             ) : auditData && auditData.items.length > 0 ? (
               <>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Action</TableHead>
-                      <TableHead>Entity</TableHead>
-                      <TableHead>User</TableHead>
-                      <TableHead className="hidden md:table-cell">Details</TableHead>
-                      <TableHead className="hidden md:table-cell">IP Address</TableHead>
-                      <TableHead>When</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {auditData.items.map((log) => (
-                      <TableRow key={log.id}>
-                        <TableCell className="font-medium">{log.action}</TableCell>
-                        <TableCell>{log.entityName}</TableCell>
-                        <TableCell>{log.userName ?? "—"}</TableCell>
-                        <TableCell className="hidden max-w-xs truncate text-muted-foreground md:table-cell">
-                          {log.details || "—"}
-                        </TableCell>
-                        <TableCell className="hidden text-muted-foreground md:table-cell">
-                          {log.ipAddress ?? "—"}
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {format(new Date(log.createdAt), "PPp")}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <AnimatePresence mode="wait">
+                  <motion.div key={page} initial="hidden" animate="visible" variants={fadeIn}>
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead>Action</TableHead>
+                          <TableHead>Entity</TableHead>
+                          <TableHead>User</TableHead>
+                          <TableHead className="hidden md:table-cell">Details</TableHead>
+                          <TableHead className="hidden md:table-cell">IP Address</TableHead>
+                          <TableHead>When</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {auditData.items.map((log) => (
+                          <TableRow key={log.id}>
+                            <TableCell>
+                              <StatusBadge tone={auditActionTone(log.action)}>{log.action}</StatusBadge>
+                            </TableCell>
+                            <TableCell className="font-medium">{log.entityName}</TableCell>
+                            <TableCell className="text-muted-foreground">{log.userName ?? "—"}</TableCell>
+                            <TableCell className="hidden max-w-xs truncate text-muted-foreground md:table-cell">
+                              {log.details || "—"}
+                            </TableCell>
+                            <TableCell className="hidden text-muted-foreground md:table-cell">
+                              {log.ipAddress ?? "—"}
+                            </TableCell>
+                            <TableCell className="text-muted-foreground">
+                              {format(new Date(log.createdAt), "PPp")}
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </motion.div>
+                </AnimatePresence>
                 <PaginationFooter
                   page={auditData.page}
                   totalPages={auditData.totalPages}

@@ -1,13 +1,17 @@
 "use client"
 
 import * as React from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { Plus, MoreHorizontal, School, Search } from "lucide-react"
 import { toast } from "sonner"
 
 import { useAuth } from "@/lib/auth/auth-context"
 import { useClasses, useDeleteClass } from "@/hooks/queries/use-classes"
 import { useDebouncedValue } from "@/hooks/use-debounced-value"
+import { useSortState } from "@/hooks/use-sort-state"
 import { getErrorMessage } from "@/lib/api/error"
+import { activeStatusTone } from "@/lib/status-styles"
+import { fadeIn } from "@/lib/motion"
 import type { ClassDto } from "@/lib/schemas/classes"
 
 import { PageHeader } from "@/components/features/page-header"
@@ -16,11 +20,12 @@ import { ErrorState } from "@/components/features/error-state"
 import { PaginationFooter } from "@/components/features/pagination-footer"
 import { ConfirmDeleteDialog } from "@/components/features/confirm-delete-dialog"
 import { ClassFormDialog } from "@/components/features/classes/class-form-dialog"
+import { TableSkeleton } from "@/components/features/table-skeleton"
+import { StatusBadge } from "@/components/features/status-badge"
+import { SortableHead } from "@/components/features/sortable-head"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Badge } from "@/components/ui/badge"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import {
   DropdownMenu,
@@ -36,12 +41,13 @@ export default function ClassesPage() {
   const [page, setPage] = React.useState(1)
   const [search, setSearch] = React.useState("")
   const debouncedSearch = useDebouncedValue(search)
+  const { sortDir, toggleSort } = useSortState("name")
 
   const [formOpen, setFormOpen] = React.useState(false)
   const [editingClass, setEditingClass] = React.useState<ClassDto | null>(null)
   const [deletingClass, setDeletingClass] = React.useState<ClassDto | null>(null)
 
-  const { data, isLoading, isError } = useClasses({ page, pageSize: 10, search: debouncedSearch })
+  const { data, isLoading, isError, refetch } = useClasses({ page, pageSize: 10, search: debouncedSearch, sortDir })
   const deleteClass = useDeleteClass()
 
   function openCreate() {
@@ -93,66 +99,66 @@ export default function ClassesPage() {
         />
       </div>
 
-      <div className="rounded-lg border bg-background">
+      <div className="overflow-hidden rounded-lg border bg-background shadow-sm">
         {isError ? (
           <div className="p-6">
-            <ErrorState message="Could not load classes. Please try again." />
+            <ErrorState message="Could not load classes. Please try again." onRetry={() => refetch()} />
           </div>
         ) : isLoading ? (
-          <div className="space-y-3 p-4">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Skeleton key={i} className="h-10 w-full" />
-            ))}
-          </div>
+          <TableSkeleton columns={isAdmin ? 5 : 4} />
         ) : data && data.items.length > 0 ? (
           <>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead className="hidden md:table-cell">Description</TableHead>
-                  <TableHead>Students</TableHead>
-                  <TableHead>Status</TableHead>
-                  {isAdmin && <TableHead className="w-12" />}
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.items.map((classItem) => (
-                  <TableRow key={classItem.id}>
-                    <TableCell className="font-medium">{classItem.name}</TableCell>
-                    <TableCell className="hidden max-w-xs truncate text-muted-foreground md:table-cell">
-                      {classItem.description || "—"}
-                    </TableCell>
-                    <TableCell>{classItem.studentCount}</TableCell>
-                    <TableCell>
-                      <Badge variant={classItem.isActive ? "default" : "secondary"}>
-                        {classItem.isActive ? "Active" : "Inactive"}
-                      </Badge>
-                    </TableCell>
-                    {isAdmin && (
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreHorizontal className="size-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onSelect={() => openEdit(classItem)}>Edit</DropdownMenuItem>
-                            <DropdownMenuItem
-                              variant="destructive"
-                              onSelect={() => setDeletingClass(classItem)}
-                            >
-                              Deactivate
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    )}
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+            <AnimatePresence mode="wait">
+              <motion.div key={page} initial="hidden" animate="visible" variants={fadeIn}>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <SortableHead label="Name" sortKey="name" activeSortKey="name" sortDir={sortDir} onSort={toggleSort} />
+                      <TableHead className="hidden md:table-cell">Description</TableHead>
+                      <TableHead>Students</TableHead>
+                      <TableHead>Status</TableHead>
+                      {isAdmin && <TableHead className="w-12" />}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.items.map((classItem) => (
+                      <TableRow key={classItem.id}>
+                        <TableCell className="font-medium">{classItem.name}</TableCell>
+                        <TableCell className="hidden max-w-xs truncate text-muted-foreground md:table-cell">
+                          {classItem.description || "—"}
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{classItem.studentCount}</TableCell>
+                        <TableCell>
+                          <StatusBadge tone={activeStatusTone[classItem.isActive ? "active" : "inactive"]}>
+                            {classItem.isActive ? "Active" : "Inactive"}
+                          </StatusBadge>
+                        </TableCell>
+                        {isAdmin && (
+                          <TableCell>
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="icon">
+                                  <MoreHorizontal className="size-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onSelect={() => openEdit(classItem)}>Edit</DropdownMenuItem>
+                                <DropdownMenuItem
+                                  variant="destructive"
+                                  onSelect={() => setDeletingClass(classItem)}
+                                >
+                                  Deactivate
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        )}
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </motion.div>
+            </AnimatePresence>
             <PaginationFooter
               page={data.page}
               totalPages={data.totalPages}

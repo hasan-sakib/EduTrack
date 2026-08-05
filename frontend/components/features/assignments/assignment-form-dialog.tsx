@@ -18,6 +18,7 @@ import {
 import type { PagedResult } from "@/lib/schemas/common"
 import { useCreateAssignment, useUpdateAssignment } from "@/hooks/queries/use-assignments"
 import { getErrorMessage } from "@/lib/api/error"
+import { DateTimePicker } from "@/components/features/date-time-picker"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -51,22 +52,6 @@ interface AssignmentFormDialogProps {
 }
 
 type FormValues = CreateAssignmentFormValues
-
-/** Converts an ISO date string to the value shape expected by <input type="datetime-local">. */
-function toDatetimeLocalValue(iso: string): string {
-  const date = new Date(iso)
-  if (Number.isNaN(date.getTime())) return ""
-  const pad = (n: number) => String(n).padStart(2, "0")
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
-}
-
-/** Converts a <input type="datetime-local"> value back to an ISO date string. */
-function fromDatetimeLocalValue(value: string): string {
-  if (!value) return ""
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return ""
-  return date.toISOString()
-}
 
 export function AssignmentFormDialog({ open, onOpenChange, assignmentToEdit }: AssignmentFormDialogProps) {
   const isEdit = !!assignmentToEdit
@@ -103,27 +88,26 @@ export function AssignmentFormDialog({ open, onOpenChange, assignmentToEdit }: A
         title: assignmentToEdit?.title ?? "",
         description: assignmentToEdit?.description ?? "",
         maxMarks: assignmentToEdit?.maxMarks ?? 100,
-        dueDate: assignmentToEdit ? toDatetimeLocalValue(assignmentToEdit.dueDate) : "",
+        dueDate: assignmentToEdit?.dueDate ?? "",
         allowResubmission: assignmentToEdit?.allowResubmission ?? false,
       })
     }
   }, [open, assignmentToEdit, form])
 
   async function onSubmit(values: FormValues) {
-    const dueDate = fromDatetimeLocalValue(values.dueDate)
     try {
       if (isEdit) {
         const updateValues: UpdateAssignmentFormValues = {
           title: values.title,
           description: values.description,
           maxMarks: values.maxMarks,
-          dueDate,
+          dueDate: values.dueDate,
           allowResubmission: values.allowResubmission,
         }
         await updateAssignment.mutateAsync(updateValues)
         toast.success("Assignment updated")
       } else {
-        await createAssignment.mutateAsync({ ...values, dueDate })
+        await createAssignment.mutateAsync(values)
         toast.success("Assignment created")
       }
       onOpenChange(false)
@@ -203,34 +187,32 @@ export function AssignmentFormDialog({ open, onOpenChange, assignmentToEdit }: A
                 </FormItem>
               )}
             />
-            <div className="grid grid-cols-2 gap-4">
-              <FormField
-                control={form.control}
-                name="maxMarks"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Max Marks</FormLabel>
-                    <FormControl>
-                      <Input type="number" min={1} {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="dueDate"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Due Date</FormLabel>
-                    <FormControl>
-                      <Input type="datetime-local" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+            <FormField
+              control={form.control}
+              name="maxMarks"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Max Marks</FormLabel>
+                  <FormControl>
+                    <Input type="number" min={1} {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="dueDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Due Date</FormLabel>
+                  <FormControl>
+                    <DateTimePicker value={field.value} onChange={field.onChange} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="allowResubmission"

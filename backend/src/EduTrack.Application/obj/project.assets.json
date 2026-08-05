@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "targets": {
     "net9.0": {
       "AutoMapper/13.0.1": {
@@ -562,19 +562,19 @@
     ]
   },
   "packageFolders": {
-    "/root/.nuget/packages/": {}
+    "/Users/sakib/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/src/src/EduTrack.Application/EduTrack.Application.csproj",
+      "projectUniqueName": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Application/EduTrack.Application.csproj",
       "projectName": "EduTrack.Application",
-      "projectPath": "/src/src/EduTrack.Application/EduTrack.Application.csproj",
-      "packagesPath": "/root/.nuget/packages/",
-      "outputPath": "/src/src/EduTrack.Application/obj/",
+      "projectPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Application/EduTrack.Application.csproj",
+      "packagesPath": "/Users/sakib/.nuget/packages/",
+      "outputPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Application/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/root/.nuget/NuGet/NuGet.Config"
+        "/Users/sakib/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net9.0"
@@ -584,10 +584,11 @@
       },
       "frameworks": {
         "net9.0": {
+          "framework": "net9.0",
           "targetAlias": "net9.0",
           "projectReferences": {
-            "/src/src/EduTrack.Domain/EduTrack.Domain.csproj": {
-              "projectPath": "/src/src/EduTrack.Domain/EduTrack.Domain.csproj"
+            "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/EduTrack.Domain.csproj": {
+              "projectPath": "/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/EduTrack.Domain.csproj"
             }
           }
         }
@@ -602,10 +603,11 @@
         "auditLevel": "low",
         "auditMode": "direct"
       },
-      "SdkAnalysisLevel": "9.0.300"
+      "SdkAnalysisLevel": "10.0.300"
     },
     "frameworks": {
       "net9.0": {
+        "framework": "net9.0",
         "targetAlias": "net9.0",
         "dependencies": {
           "AutoMapper": {
@@ -640,12 +642,22 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[9.0.18, 9.0.18]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[9.0.18, 9.0.18]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.NETCore.App": {
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/9.0.316/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/10.0.302/PortableRuntimeIdentifierGraph.json"
       }
     }
   },
