@@ -1,0 +1,7 @@
+{
+  "EduTrack.Api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/src\/src\/EduTrack.Api",
+  "EduTrack.Application, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/src\/src\/EduTrack.Application",
+  "EduTrack.Domain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/src\/src\/EduTrack.Domain",
+  "EduTrack.Infrastructure, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/src\/src\/EduTrack.Infrastructure",
+  "EduTrack.Persistence, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null": "\/src\/src\/EduTrack.Persistence"
+}

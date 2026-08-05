@@ -1,0 +1,15 @@
+/src/src/EduTrack.Application/bin/Debug/net9.0/EduTrack.Application.deps.json
+/src/src/EduTrack.Application/bin/Debug/net9.0/EduTrack.Application.dll
+/src/src/EduTrack.Application/bin/Debug/net9.0/EduTrack.Application.pdb
+/src/src/EduTrack.Application/bin/Debug/net9.0/EduTrack.Domain.dll
+/src/src/EduTrack.Application/bin/Debug/net9.0/EduTrack.Domain.pdb
+/src/src/EduTrack.Application/obj/Debug/net9.0/EduTrack.Application.csproj.AssemblyReference.cache
+/src/src/EduTrack.Application/obj/Debug/net9.0/EduTrack.Application.GeneratedMSBuildEditorConfig.editorconfig
+/src/src/EduTrack.Application/obj/Debug/net9.0/EduTrack.Application.AssemblyInfoInputs.cache
+/src/src/EduTrack.Application/obj/Debug/net9.0/EduTrack.Application.AssemblyInfo.cs
+/src/src/EduTrack.Application/obj/Debug/net9.0/EduTrack.Application.csproj.CoreCompileInputs.cache
+/src/src/EduTrack.Application/obj/Debug/net9.0/EduTrack.49EFA750.Up2Date
+/src/src/EduTrack.Application/obj/Debug/net9.0/EduTrack.Application.dll
+/src/src/EduTrack.Application/obj/Debug/net9.0/refint/EduTrack.Application.dll
+/src/src/EduTrack.Application/obj/Debug/net9.0/EduTrack.Application.pdb
+/src/src/EduTrack.Application/obj/Debug/net9.0/ref/EduTrack.Application.dll

@@ -1,0 +1,49 @@
+2026-08-05 09:42:33.030 +00:00 [WRN] Storing keys in a directory '/root/.aspnet/DataProtection-Keys' that may not be persisted outside of the container. Protected data will be unavailable when container is destroyed. For more information go to https://aka.ms/aspnet/dataprotectionwarning
+2026-08-05 09:42:33.048 +00:00 [WRN] No XML encryptor configured. Key {e7111134-395a-4c52-8f9f-b70ebdb0f35b} may be persisted to storage in unencrypted form.
+2026-08-05 09:42:33.294 +00:00 [ERR] HTTP POST /api/v1/auth/login responded 500 in 196.3634 ms
+EduTrack.Domain.Exceptions.AuthenticationException: Invalid email or password.
+   at EduTrack.Application.Services.AuthService.LoginAsync(LoginRequest request, String ipAddress, CancellationToken ct) in /src/src/EduTrack.Application/Services/AuthService.cs:line 39
+   at EduTrack.Api.Controllers.AuthController.Login(LoginRequest request, CancellationToken ct) in /src/src/EduTrack.Api/Controllers/AuthController.cs:line 35
+   at lambda_method578(Closure, Object)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.AwaitableObjectResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+2026-08-05 09:42:33.304 +00:00 [WRN] Authentication failed for POST /api/v1/auth/login
+EduTrack.Domain.Exceptions.AuthenticationException: Invalid email or password.
+   at EduTrack.Application.Services.AuthService.LoginAsync(LoginRequest request, String ipAddress, CancellationToken ct) in /src/src/EduTrack.Application/Services/AuthService.cs:line 39
+   at EduTrack.Api.Controllers.AuthController.Login(LoginRequest request, CancellationToken ct) in /src/src/EduTrack.Api/Controllers/AuthController.cs:line 35
+   at lambda_method578(Closure, Object)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ActionMethodExecutor.AwaitableObjectResultExecutor.Execute(ActionContext actionContext, IActionResultTypeMapper mapper, ObjectMethodExecutor executor, Object controller, Object[] arguments)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeActionMethodAsync>g__Awaited|12_0(ControllerActionInvoker invoker, ValueTask`1 actionResultValueTask)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.<InvokeNextActionFilterAsync>g__Awaited|10_0(ControllerActionInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Rethrow(ActionExecutedContextSealed context)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.Next(State& next, Scope& scope, Object& state, Boolean& isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ControllerActionInvoker.InvokeInnerFilterAsync()
+--- End of stack trace from previous location ---
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeFilterPipelineAsync>g__Awaited|20_0(ResourceInvoker invoker, Task lastTask, State next, Scope scope, Object state, Boolean isCompleted)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Mvc.Infrastructure.ResourceInvoker.<InvokeAsync>g__Awaited|17_0(ResourceInvoker invoker, Task task, IDisposable scope)
+   at Microsoft.AspNetCore.Authorization.AuthorizationMiddleware.Invoke(HttpContext context)
+   at Microsoft.AspNetCore.Authentication.AuthenticationMiddleware.Invoke(HttpContext context)
+   at Swashbuckle.AspNetCore.SwaggerUI.SwaggerUIMiddleware.Invoke(HttpContext httpContext)
+   at Swashbuckle.AspNetCore.Swagger.SwaggerMiddleware.Invoke(HttpContext httpContext, ISwaggerProvider swaggerProvider)
+   at Serilog.AspNetCore.RequestLoggingMiddleware.Invoke(HttpContext httpContext)
+   at EduTrack.Api.Middleware.ExceptionHandlingMiddleware.InvokeAsync(HttpContext context) in /src/src/EduTrack.Api/Middleware/ExceptionHandlingMiddleware.cs:line 23
+2026-08-05 09:42:33.517 +00:00 [INF] HTTP POST /api/v1/auth/login responded 200 in 194.1222 ms
+2026-08-05 09:42:33.549 +00:00 [INF] HTTP GET /api/v1/auth/me responded 200 in 29.1769 ms
+2026-08-05 09:42:33.710 +00:00 [INF] HTTP POST /api/v1/auth/login responded 200 in 157.4320 ms
+2026-08-05 09:42:33.713 +00:00 [INF] HTTP GET /api/v1/users responded 403 in 1.5602 ms
+2026-08-05 09:42:33.715 +00:00 [INF] HTTP GET /api/v1/users responded 401 in 1.4402 ms
+2026-08-05 09:42:33.858 +00:00 [INF] HTTP POST /api/v1/auth/login responded 200 in 140.8987 ms

@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>EduTrack.Application</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="FluentValidation" Version="11.9.2" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.2" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.4" />
+    <!-- Referenced here (not just in Persistence) so the reusable pagination extension in
+         Common/QueryableExtensions.cs can call the async LINQ operators (ToListAsync/CountAsync)
+         against the IQueryable<T> exposed by IRepository<T>.Query(), per Jason Taylor's Clean
+         Architecture template convention. No provider-specific (Npgsql) package is referenced here. -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\EduTrack.Domain\EduTrack.Domain.csproj" />
+  </ItemGroup>
+
+</Project>
