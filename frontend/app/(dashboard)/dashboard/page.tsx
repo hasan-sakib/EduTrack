@@ -240,10 +240,13 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent className="flex flex-col gap-2">
               {quickActions.map((action) => (
-                <Button key={action.href} variant="outline" className="justify-start" asChild>
+                <Button key={action.href} className="justify-between" asChild>
                   <Link href={action.href}>
-                    <action.icon className="size-4" />
-                    {action.label}
+                    <span className="flex items-center gap-2">
+                      <action.icon className="size-4" />
+                      {action.label}
+                    </span>
+                    <ArrowRight className="size-4" />
                   </Link>
                 </Button>
               ))}

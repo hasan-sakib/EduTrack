@@ -29,7 +29,7 @@ export function NavLinks({ role, onNavigate }: { role: Role; onNavigate?: () => 
             {isActive && (
               <motion.span
                 layoutId="active-nav-pill"
-                className="absolute inset-0 rounded-md bg-primary shadow-sm"
+                className="absolute inset-0 rounded-md bg-linear-to-b from-primary to-primary/90 shadow-[0_2px_10px_-2px_var(--color-primary)]"
                 transition={{ type: "spring", stiffness: 500, damping: 38 }}
               />
             )}

@@ -23,25 +23,37 @@ function getRole(decoded: DecodedToken | null): string | null {
   return (decoded["http://schemas.microsoft.com/ws/2008/06/identity/claims/role"] as string) ?? null
 }
 
+function isTokenValid(decoded: DecodedToken | null): boolean {
+  if (!decoded) return false
+  const exp = decoded["exp"] as number | undefined
+  return typeof exp === "number" && Date.now() < exp * 1000
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
   const token = request.cookies.get("et_access_token")?.value
+  const decoded = token ? decodeJwtPayload(token) : null
+  const hasValidToken = isTokenValid(decoded)
 
   if (PUBLIC_PATHS.includes(pathname)) {
-    if (token) {
+    if (hasValidToken) {
       return NextResponse.redirect(new URL("/dashboard", request.url))
     }
     return NextResponse.next()
   }
 
-  if (!token) {
+  if (!hasValidToken) {
     const loginUrl = new URL("/login", request.url)
     loginUrl.searchParams.set("from", pathname)
-    return NextResponse.redirect(loginUrl)
+    const response = NextResponse.redirect(loginUrl)
+    if (token) {
+      response.cookies.delete("et_access_token")
+    }
+    return response
   }
 
   if (ADMIN_ONLY_PATHS.some((path) => pathname.startsWith(path))) {
-    const role = getRole(decodeJwtPayload(token))
+    const role = getRole(decoded)
     if (role !== "Admin") {
       return NextResponse.redirect(new URL("/dashboard", request.url))
     }

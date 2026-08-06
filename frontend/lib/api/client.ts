@@ -23,7 +23,10 @@ let refreshPromise: Promise<string | null> | null = null
 
 async function refreshAccessToken(): Promise<string | null> {
   const refreshToken = getRefreshToken()
-  if (!refreshToken) return null
+  if (!refreshToken) {
+    clearTokens()
+    return null
+  }
 
   try {
     const response = await axios.post(`${API_BASE_URL}/auth/refresh`, { refreshToken })

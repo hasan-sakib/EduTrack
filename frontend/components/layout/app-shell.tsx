@@ -48,8 +48,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen w-full bg-muted/20">
-      <aside className="hidden w-64 shrink-0 border-r bg-background md:flex md:flex-col">
-        <div className="border-b px-4 py-4">
+      <aside className="hidden w-64 shrink-0 border-r bg-accent/60 md:flex md:flex-col">
+        <div className="border-b border-primary/10 px-4 py-4">
           <Logo />
         </div>
         <div className="flex-1 overflow-y-auto p-3">
@@ -61,6 +61,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <header
           className={cn(
             "sticky top-0 z-10 flex h-16 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur transition-shadow duration-200 supports-backdrop-filter:bg-background/75",
+            "after:absolute after:inset-x-0 after:top-full after:h-px after:bg-linear-to-r after:from-primary/40 after:via-primary/10 after:to-transparent",
+            "relative",
             scrolled && "shadow-sm"
           )}
         >
