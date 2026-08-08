@@ -18,7 +18,7 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, roles: ["Admin", "Teacher", "Student"] },
+  { href: "/dashboard", label: "Home", icon: LayoutDashboard, roles: ["Admin", "Teacher", "Student"] },
   { href: "/users", label: "Users", icon: Users, roles: ["Admin"] },
   { href: "/classes", label: "Classes", icon: School, roles: ["Admin", "Teacher", "Student"] },
   { href: "/subjects", label: "Subjects", icon: BookOpen, roles: ["Admin", "Teacher", "Student"] },
