@@ -19,6 +19,7 @@ import type { PagedResult } from "@/lib/schemas/common"
 import { useCreateAssignment, useUpdateAssignment } from "@/hooks/queries/use-assignments"
 import { getErrorMessage } from "@/lib/api/error"
 import { DateTimePicker } from "@/components/features/date-time-picker"
+import { FileUploadField } from "@/components/features/file-upload-field"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -78,6 +79,7 @@ export function AssignmentFormDialog({ open, onOpenChange, assignmentToEdit }: A
       maxMarks: 100,
       dueDate: "",
       allowResubmission: false,
+      attachmentUrl: null,
     },
   })
 
@@ -90,6 +92,7 @@ export function AssignmentFormDialog({ open, onOpenChange, assignmentToEdit }: A
         maxMarks: assignmentToEdit?.maxMarks ?? 100,
         dueDate: assignmentToEdit?.dueDate ?? "",
         allowResubmission: assignmentToEdit?.allowResubmission ?? false,
+        attachmentUrl: assignmentToEdit?.attachmentUrl ?? null,
       })
     }
   }, [open, assignmentToEdit, form])
@@ -103,6 +106,7 @@ export function AssignmentFormDialog({ open, onOpenChange, assignmentToEdit }: A
           maxMarks: values.maxMarks,
           dueDate: values.dueDate,
           allowResubmission: values.allowResubmission,
+          attachmentUrl: values.attachmentUrl,
         }
         await updateAssignment.mutateAsync(updateValues)
         toast.success("Assignment updated")
@@ -208,6 +212,19 @@ export function AssignmentFormDialog({ open, onOpenChange, assignmentToEdit }: A
                   <FormLabel>Due Date</FormLabel>
                   <FormControl>
                     <DateTimePicker value={field.value} onChange={field.onChange} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="attachmentUrl"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Attachment (optional)</FormLabel>
+                  <FormControl>
+                    <FileUploadField value={field.value} onChange={field.onChange} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

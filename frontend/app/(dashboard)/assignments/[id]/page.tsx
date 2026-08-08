@@ -5,7 +5,7 @@ import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { ArrowLeft, Check, Loader2 } from "lucide-react"
+import { ArrowLeft, Check, Download, Loader2 } from "lucide-react"
 import { format } from "date-fns"
 import { toast } from "sonner"
 import { motion } from "framer-motion"
@@ -14,6 +14,7 @@ import { apiClient } from "@/lib/api/client"
 import { useAuth } from "@/lib/auth/auth-context"
 import { useAssignment } from "@/hooks/queries/use-assignments"
 import { getErrorMessage } from "@/lib/api/error"
+import { downloadFile } from "@/lib/api/files"
 import { getDeadlineInfo } from "@/lib/deadline"
 import { assignmentStatusTone, submissionStatusTone } from "@/lib/status-styles"
 import { fadeInUp } from "@/lib/motion"
@@ -31,6 +32,7 @@ import { PageHeader } from "@/components/features/page-header"
 import { ErrorState } from "@/components/features/error-state"
 import { StatusBadge } from "@/components/features/status-badge"
 import { AssignmentFormDialog } from "@/components/features/assignments/assignment-form-dialog"
+import { FileUploadField } from "@/components/features/file-upload-field"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -126,6 +128,24 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
                 <p className="font-medium">{assignment.allowResubmission ? "Yes" : "No"}</p>
               </div>
             </div>
+
+            {assignment.attachmentUrl && (
+              <>
+                <Separator />
+                <div>
+                  <p className="mb-1.5 text-sm text-muted-foreground">Attachment</p>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => downloadFile(assignment.attachmentUrl!, `${assignment.title}-attachment`)}
+                  >
+                    <Download className="size-4" />
+                    Download attachment
+                  </Button>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </motion.div>
@@ -220,7 +240,7 @@ function StudentSubmissionPanel({
     mutationFn: async (values: CreateSubmissionFormValues) => {
       const response = await apiClient.post<SubmissionDto>(`/assignments/${assignmentId}/submissions`, {
         content: values.content?.trim() || null,
-        fileUrl: null,
+        fileUrl: values.fileUrl?.trim() || null,
       })
       return response.data
     },
@@ -293,6 +313,17 @@ function StudentSubmissionPanel({
                       {submission.gradedAt ? ` on ${format(new Date(submission.gradedAt), "PPp")}` : ""}
                     </p>
                   )}
+                  {submission.fileUrl && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => downloadFile(submission.fileUrl!, "your-submission")}
+                    >
+                      <Download className="size-4" />
+                      Download your submitted file
+                    </Button>
+                  )}
                 </div>
               ) : deadlineMissedNoSubmission ? (
                 <p className="text-sm text-muted-foreground">The deadline for this assignment has passed.</p>
@@ -307,6 +338,22 @@ function StudentSubmissionPanel({
                           <FormLabel>Your answer</FormLabel>
                           <FormControl>
                             <Textarea rows={6} placeholder="Write your answer here..." {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="fileUrl"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Attach a file (optional)</FormLabel>
+                          <FormControl>
+                            <FileUploadField
+                              value={field.value}
+                              onChange={(key) => field.onChange(key ?? "")}
+                            />
                           </FormControl>
                           <FormMessage />
                         </FormItem>
@@ -332,6 +379,17 @@ function StudentSubmissionPanel({
                         ? "; the due date has passed so it can no longer be changed."
                         : "."}
                   </p>
+                  {submission.fileUrl && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => downloadFile(submission.fileUrl!, "your-submission")}
+                    >
+                      <Download className="size-4" />
+                      Download your submitted file
+                    </Button>
+                  )}
                 </div>
               ) : null}
             </>

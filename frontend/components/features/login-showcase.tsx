@@ -1,4 +1,5 @@
-import { CheckCircle2, GraduationCap } from "lucide-react"
+import Image from "next/image"
+import { CheckCircle2 } from "lucide-react"
 
 /**
  * Decorative brand panel for the sign-in page. Animation is plain CSS (`animate-orb-*`,
@@ -9,24 +10,22 @@ import { CheckCircle2, GraduationCap } from "lucide-react"
  */
 export function LoginShowcase() {
   return (
-    <div className="relative hidden h-full flex-col justify-between overflow-hidden bg-gradient-to-br from-slate-950 via-indigo-950 to-slate-900 p-10 lg:flex">
+    <div className="relative hidden h-full flex-col justify-between overflow-hidden bg-neutral-950 p-10 lg:flex">
       <div
         aria-hidden
-        className="absolute -top-24 -left-16 size-80 animate-orb-float rounded-full bg-indigo-500/30 blur-3xl"
+        className="absolute -top-24 -left-16 size-80 animate-orb-float rounded-full bg-white/10 blur-3xl"
       />
       <div
         aria-hidden
-        className="absolute -right-20 top-1/3 size-96 animate-orb-drift rounded-full bg-violet-500/20 blur-3xl"
+        className="absolute -right-20 top-1/3 size-96 animate-orb-drift rounded-full bg-white/[0.07] blur-3xl"
       />
       <div
         aria-hidden
-        className="absolute bottom-0 left-1/4 size-72 animate-orb-float rounded-full bg-sky-500/10 blur-3xl"
+        className="absolute bottom-0 left-1/4 size-72 animate-orb-float rounded-full bg-white/5 blur-3xl"
       />
 
       <div className="flex items-center gap-2 text-white">
-        <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
-          <GraduationCap className="size-4" />
-        </div>
+        <Image src="/logo-icon.png" alt="EduTrack" width={32} height={32} priority />
         <p className="text-xl font-semibold">EduTrack</p>
       </div>
 
@@ -36,7 +35,7 @@ export function LoginShowcase() {
           className="w-72 animate-card-float rounded-2xl border border-white/10 bg-white/[0.07] p-4 shadow-2xl backdrop-blur-sm"
         >
           <div className="flex items-center gap-2.5 border-b border-white/10 pb-3">
-            <div className="flex size-8 items-center justify-center rounded-full bg-indigo-400/30 text-xs font-semibold text-white">
+            <div className="flex size-8 items-center justify-center rounded-full bg-white/15 text-xs font-semibold text-white">
               DT
             </div>
             <div>
@@ -51,7 +50,7 @@ export function LoginShowcase() {
               { label: "Reading Response #6", status: "Open" },
             ].map((row) => (
               <div key={row.label} className="flex items-center gap-2 text-xs">
-                <CheckCircle2 className="size-3.5 shrink-0 text-emerald-400/80" />
+                <CheckCircle2 className="size-3.5 shrink-0 text-white/70" />
                 <span className="flex-1 truncate text-white/80">{row.label}</span>
                 <span className="shrink-0 text-white/40">{row.status}</span>
               </div>

@@ -36,10 +36,10 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 
 const STAT_TONES = {
-  primary: "text-primary",
-  info: "text-info",
-  success: "text-success",
-  warning: "text-warning",
+  primary: "text-foreground/70",
+  info: "text-foreground/70",
+  success: "text-foreground/70",
+  warning: "text-foreground/70",
 } as const
 
 const ACCENT_BAR_TONES = {

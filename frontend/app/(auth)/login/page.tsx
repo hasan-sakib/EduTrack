@@ -1,16 +1,18 @@
 "use client"
 
 import * as React from "react"
+import Image from "next/image"
 import { useRouter, useSearchParams } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
-import { GraduationCap, Loader2, AtSign, Lock, ArrowRight } from "lucide-react"
+import { Loader2, AtSign, Lock, ArrowRight } from "lucide-react"
 import { toast } from "sonner"
 import { isAxiosError } from "axios"
 
 import { useAuth } from "@/lib/auth/auth-context"
 import { loginSchema, type LoginFormValues } from "@/lib/schemas/auth"
 import { LoginShowcase } from "@/components/features/login-showcase"
+import { ThemeToggle } from "@/components/features/theme-toggle"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -54,12 +56,13 @@ function LoginForm() {
     <main className="grid min-h-screen lg:grid-cols-2">
       <LoginShowcase />
 
-      <div className="flex min-h-screen items-center justify-center bg-muted/30 p-4">
+      <div className="relative flex min-h-screen items-center justify-center bg-muted/30 p-4">
+        <div className="absolute top-4 right-4">
+          <ThemeToggle />
+        </div>
         <div className="w-full max-w-sm space-y-6 rounded-xl border bg-background p-8 shadow-sm">
           <div className="flex flex-col items-center space-y-2 text-center">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <GraduationCap className="size-5" />
-            </div>
+            <Image src="/logo-icon.png" alt="EduTrack" width={40} height={40} priority />
             <h1 className="text-2xl font-bold tracking-tight">Sign in to EduTrack</h1>
             <p className="text-sm text-muted-foreground">
               Enter your credentials to access your dashboard.

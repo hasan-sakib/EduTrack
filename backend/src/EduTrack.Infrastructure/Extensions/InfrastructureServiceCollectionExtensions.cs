@@ -14,10 +14,11 @@ public static class InfrastructureServiceCollectionExtensions
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+        services.Configure<StorageSettings>(configuration.GetSection("Storage"));
 
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddSingleton<ITokenService, TokenService>();
-        services.AddSingleton<IFileStorageService, LocalFileStorageService>();
+        services.AddSingleton<IFileStorageService, RustFsFileStorageService>();
         services.AddSingleton<IDateTimeProvider, SystemDateTimeProvider>();
 
         var jwtSection = configuration.GetSection("Jwt");

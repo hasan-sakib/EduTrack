@@ -2,11 +2,11 @@ namespace EduTrack.Application.Interfaces;
 
 public interface IFileStorageService
 {
-    /// <summary>Persists the stream and returns a relative path/URL that can be stored on the entity.</summary>
+    /// <summary>Persists the stream and returns a relative path/key that can be stored on the entity.</summary>
     Task<string> SaveAsync(Stream content, string fileName, CancellationToken ct = default);
 
-    void Delete(string relativePath);
+    Task DeleteAsync(string relativePath, CancellationToken ct = default);
 
-    /// <summary>Resolves a relative path returned by SaveAsync back to an absolute path on disk, for serving downloads.</summary>
-    string GetPhysicalPath(string relativePath);
+    /// <summary>Opens a readable stream for a relative path/key returned by SaveAsync, or null if it doesn't exist.</summary>
+    Task<Stream?> OpenReadAsync(string relativePath, CancellationToken ct = default);
 }

@@ -70,6 +70,7 @@ public class AssignmentService : IAssignmentService
             MaxMarks = request.MaxMarks,
             DueDate = request.DueDate,
             AllowResubmission = request.AllowResubmission,
+            AttachmentUrl = request.AttachmentUrl,
             Status = AssignmentStatus.Draft
         };
 
@@ -91,6 +92,7 @@ public class AssignmentService : IAssignmentService
         tracked.MaxMarks = request.MaxMarks;
         tracked.DueDate = request.DueDate;
         tracked.AllowResubmission = request.AllowResubmission;
+        tracked.AttachmentUrl = request.AttachmentUrl;
 
         _unitOfWork.Assignments.Update(tracked);
         await _unitOfWork.SaveChangesAsync(ct);

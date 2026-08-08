@@ -41,6 +41,7 @@ export const createAssignmentSchema = z.object({
   maxMarks: z.coerce.number().int().positive("Max marks must be greater than 0"),
   dueDate: z.string().min(1, "Due date is required"),
   allowResubmission: z.boolean(),
+  attachmentUrl: z.string().nullable().optional(),
 })
 
 export type CreateAssignmentFormValues = z.infer<typeof createAssignmentSchema>
@@ -51,6 +52,7 @@ export const updateAssignmentSchema = z.object({
   maxMarks: z.coerce.number().int().positive("Max marks must be greater than 0"),
   dueDate: z.string().min(1, "Due date is required"),
   allowResubmission: z.boolean(),
+  attachmentUrl: z.string().nullable().optional(),
 })
 
 export type UpdateAssignmentFormValues = z.infer<typeof updateAssignmentSchema>

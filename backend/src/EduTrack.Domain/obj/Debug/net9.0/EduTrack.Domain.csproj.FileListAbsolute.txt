@@ -9,3 +9,15 @@
 /src/src/EduTrack.Domain/obj/Debug/net9.0/refint/EduTrack.Domain.dll
 /src/src/EduTrack.Domain/obj/Debug/net9.0/EduTrack.Domain.pdb
 /src/src/EduTrack.Domain/obj/Debug/net9.0/ref/EduTrack.Domain.dll
+/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/bin/Debug/net9.0/EduTrack.Domain.deps.json
+/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/bin/Debug/net9.0/EduTrack.Domain.dll
+/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/bin/Debug/net9.0/EduTrack.Domain.pdb
+/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/obj/Debug/net9.0/EduTrack.Domain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/obj/Debug/net9.0/EduTrack.Domain.AssemblyInfoInputs.cache
+/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/obj/Debug/net9.0/EduTrack.Domain.AssemblyInfo.cs
+/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/obj/Debug/net9.0/EduTrack.Domain.csproj.CoreCompileInputs.cache
+/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/obj/Debug/net9.0/EduTrack.Domain.sourcelink.json
+/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/obj/Debug/net9.0/EduTrack.Domain.dll
+/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/obj/Debug/net9.0/refint/EduTrack.Domain.dll
+/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/obj/Debug/net9.0/EduTrack.Domain.pdb
+/Users/sakib/Projects/EduTrack/backend/src/EduTrack.Domain/obj/Debug/net9.0/ref/EduTrack.Domain.dll

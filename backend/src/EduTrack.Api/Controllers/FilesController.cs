@@ -53,19 +53,19 @@ public class FilesController : ControllerBase
     }
 
     [HttpGet("{fileName}")]
-    public IActionResult Download(string fileName)
+    public async Task<IActionResult> Download(string fileName, CancellationToken ct)
     {
-        var physicalPath = _fileStorageService.GetPhysicalPath(fileName);
-        if (!System.IO.File.Exists(physicalPath))
+        var stream = await _fileStorageService.OpenReadAsync(fileName, ct);
+        if (stream is null)
         {
             return NotFound();
         }
 
-        if (!ContentTypeProvider.TryGetContentType(physicalPath, out var contentType))
+        if (!ContentTypeProvider.TryGetContentType(fileName, out var contentType))
         {
             contentType = "application/octet-stream";
         }
 
-        return PhysicalFile(physicalPath, contentType, fileName);
+        return File(stream, contentType, fileName);
     }
 }

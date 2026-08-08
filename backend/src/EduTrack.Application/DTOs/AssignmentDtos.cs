@@ -22,10 +22,10 @@ public record AssignmentDto(
     DateTimeOffset UpdatedAt);
 
 public record CreateAssignmentRequest(
-    Guid TeacherAssignmentId, string Title, string Description, int MaxMarks, DateTimeOffset DueDate, bool AllowResubmission);
+    Guid TeacherAssignmentId, string Title, string Description, int MaxMarks, DateTimeOffset DueDate, bool AllowResubmission, string? AttachmentUrl = null);
 
 public record UpdateAssignmentRequest(
-    string Title, string Description, int MaxMarks, DateTimeOffset DueDate, bool AllowResubmission);
+    string Title, string Description, int MaxMarks, DateTimeOffset DueDate, bool AllowResubmission, string? AttachmentUrl = null);
 
 public record UpdateAssignmentStatusRequest(AssignmentStatus Status);
 

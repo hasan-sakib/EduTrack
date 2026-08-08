@@ -3,7 +3,7 @@
 import * as React from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, type Resolver } from "react-hook-form"
-import { Loader2 } from "lucide-react"
+import { Download, Loader2 } from "lucide-react"
 import { toast } from "sonner"
 
 import {
@@ -14,6 +14,7 @@ import {
 } from "@/lib/schemas/submissions"
 import { useGradeSubmission } from "@/hooks/queries/use-submissions"
 import { getErrorMessage } from "@/lib/api/error"
+import { downloadFile } from "@/lib/api/files"
 import { Button } from "@/components/ui/button"
 import {
   Dialog,
@@ -90,6 +91,29 @@ export function GradeSubmissionDialog({ open, onOpenChange, submission }: GradeS
               : "Review and grade this submission."}
           </DialogDescription>
         </DialogHeader>
+
+        {submission && (submission.content || submission.fileUrl) && (
+          <div className="space-y-3 rounded-lg border bg-muted/30 p-3 text-sm">
+            {submission.content && (
+              <div>
+                <p className="mb-1 text-muted-foreground">Student&apos;s answer</p>
+                <p className="whitespace-pre-wrap">{submission.content}</p>
+              </div>
+            )}
+            {submission.fileUrl && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => downloadFile(submission.fileUrl!, `${submission.studentName}-submission`)}
+              >
+                <Download className="size-4" />
+                Download submitted file
+              </Button>
+            )}
+          </div>
+        )}
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField

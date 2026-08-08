@@ -16,7 +16,7 @@ WORKDIR /app
 
 RUN groupadd --gid 5678 edutrack \
     && useradd --uid 5678 --gid 5678 --no-create-home edutrack \
-    && mkdir -p /app/uploads /app/logs \
+    && mkdir -p /app/logs \
     && chown -R edutrack:edutrack /app
 
 COPY --from=build /app/publish .
