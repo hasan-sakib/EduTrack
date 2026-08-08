@@ -31,16 +31,24 @@ import { fadeInUp, staggerContainer } from "@/lib/motion"
 
 import { PageHeader } from "@/components/features/page-header"
 import { EmptyState } from "@/components/features/empty-state"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 
 const STAT_TONES = {
-  primary: "bg-primary/10 text-primary",
-  info: "bg-info/10 text-info",
-  success: "bg-success/10 text-success",
-  warning: "bg-warning/15 text-warning",
+  primary: "text-primary",
+  info: "text-info",
+  success: "text-success",
+  warning: "text-warning",
+} as const
+
+const ACCENT_BAR_TONES = {
+  neutral: "bg-muted-foreground/40",
+  info: "bg-info",
+  success: "bg-success",
+  warning: "bg-warning",
+  destructive: "bg-destructive",
+  accent: "bg-accent-foreground",
 } as const
 
 function AnimatedNumber({ value }: { value: number }) {
@@ -75,24 +83,16 @@ function StatCard({
   tone: keyof typeof STAT_TONES
 }) {
   return (
-    <motion.div variants={fadeInUp}>
-      <Card className="shadow-sm transition-shadow hover:shadow-md">
-        <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-          <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-          <div className={`flex size-8 items-center justify-center rounded-lg ${STAT_TONES[tone]}`}>
-            <Icon className="size-4" />
-          </div>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <Skeleton className="h-8 w-16" />
-          ) : (
-            <div className="text-3xl font-semibold tracking-tight">
-              <AnimatedNumber value={value ?? 0} />
-            </div>
-          )}
-        </CardContent>
-      </Card>
+    <motion.div variants={fadeInUp} className="flex flex-col gap-2 py-1">
+      <Icon className={`size-5 ${STAT_TONES[tone]}`} />
+      {isLoading ? (
+        <Skeleton className="h-9 w-16" />
+      ) : (
+        <div className="text-3xl font-semibold tracking-tight">
+          <AnimatedNumber value={value ?? 0} />
+        </div>
+      )}
+      <p className="text-xs font-medium tracking-wide text-muted-foreground uppercase">{title}</p>
     </motion.div>
   )
 }
@@ -156,16 +156,34 @@ export default function DashboardPage() {
 
   return (
     <div>
-      <PageHeader
-        title={`Welcome back, ${user?.fullName.split(" ")[0]}`}
-        description="Here's what's happening in EduTrack today."
-      />
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <PageHeader
+          title={`Welcome back, ${user?.fullName.split(" ")[0]}`}
+          description="Here's what's happening in EduTrack today."
+        />
+        <div className="flex flex-wrap gap-2">
+          {quickActions.map((action, i) => (
+            <Button
+              key={action.href}
+              variant={i === 0 ? "default" : "outline"}
+              size="sm"
+              className="rounded-full"
+              asChild
+            >
+              <Link href={action.href}>
+                <action.icon className="size-4" />
+                {action.label}
+              </Link>
+            </Button>
+          ))}
+        </div>
+      </div>
 
       <motion.div
         initial="hidden"
         animate="visible"
         variants={staggerContainer}
-        className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4"
+        className="my-6 grid grid-cols-2 gap-x-4 gap-y-6 border-b pb-6 sm:grid-cols-4"
       >
         {isAdmin && (
           <StatCard title="Users" value={userCount.data} icon={Users} isLoading={userCount.isLoading} tone="primary" />
@@ -187,80 +205,60 @@ export default function DashboardPage() {
         />
       </motion.div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
-        <Card className="shadow-sm lg:col-span-2">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <CardTitle>Upcoming assignments</CardTitle>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:divide-x lg:divide-muted">
+        <div className="lg:col-span-2 lg:pr-8">
+          <div className="flex items-center justify-between border-b pb-3">
+            <h2 className="font-semibold">Upcoming assignments</h2>
             <Button variant="ghost" size="sm" asChild>
               <Link href="/assignments">
                 View all
                 <ArrowRight className="size-4" />
               </Link>
             </Button>
-          </CardHeader>
-          <CardContent>
-            {upcoming.isLoading ? (
-              <div className="space-y-3">
-                {Array.from({ length: 3 }).map((_, i) => (
-                  <Skeleton key={i} className="h-12 w-full" />
-                ))}
-              </div>
-            ) : upcoming.data && upcoming.data.length > 0 ? (
-              <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="divide-y">
-                {upcoming.data.map((assignment) => (
-                  <motion.div key={assignment.id} variants={fadeInUp}>
-                    <Link
-                      href={`/assignments/${assignment.id}`}
-                      className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0 hover:bg-muted/50 -mx-2 px-2 rounded-md transition-colors"
-                    >
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium">{assignment.title}</p>
-                        <p className="text-xs text-muted-foreground">
-                          {assignment.className} · {assignment.subjectName} · Due{" "}
-                          {format(new Date(assignment.dueDate), "PPp")}
-                        </p>
-                      </div>
-                      <Badge className={`shrink-0 border ${toneClassName[assignmentStatusTone[assignment.status]]}`}>
-                        {assignmentStatusLabels[assignment.status]}
-                      </Badge>
-                    </Link>
-                  </motion.div>
-                ))}
-              </motion.div>
-            ) : (
-              <EmptyState icon={ClipboardList} title="No assignments yet" description="Nothing to show right now." />
-            )}
-          </CardContent>
-        </Card>
-
-        <div className="space-y-4">
-          <Card className="shadow-sm">
-            <CardHeader>
-              <CardTitle>Quick actions</CardTitle>
-            </CardHeader>
-            <CardContent className="flex flex-col gap-2">
-              {quickActions.map((action) => (
-                <Button key={action.href} className="justify-between" asChild>
-                  <Link href={action.href}>
-                    <span className="flex items-center gap-2">
-                      <action.icon className="size-4" />
-                      {action.label}
-                    </span>
-                    <ArrowRight className="size-4" />
-                  </Link>
-                </Button>
+          </div>
+          {upcoming.isLoading ? (
+            <div className="space-y-3 pt-4">
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className="h-12 w-full" />
               ))}
-            </CardContent>
-          </Card>
+            </div>
+          ) : upcoming.data && upcoming.data.length > 0 ? (
+            <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="divide-y">
+              {upcoming.data.map((assignment) => (
+                <motion.div key={assignment.id} variants={fadeInUp}>
+                  <Link
+                    href={`/assignments/${assignment.id}`}
+                    className="flex items-center gap-3 py-3 pl-3 -ml-3 hover:bg-muted/50 rounded-r-md transition-colors relative"
+                  >
+                    <span
+                      className={`absolute inset-y-1.5 left-0 w-0.5 rounded-full ${ACCENT_BAR_TONES[assignmentStatusTone[assignment.status]]}`}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium">{assignment.title}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {assignment.className} · {assignment.subjectName} · Due{" "}
+                        {format(new Date(assignment.dueDate), "PPp")}
+                      </p>
+                    </div>
+                    <Badge className={`shrink-0 border ${toneClassName[assignmentStatusTone[assignment.status]]}`}>
+                      {assignmentStatusLabels[assignment.status]}
+                    </Badge>
+                  </Link>
+                </motion.div>
+              ))}
+            </motion.div>
+          ) : (
+            <EmptyState icon={ClipboardList} title="No assignments yet" description="Nothing to show right now." />
+          )}
+        </div>
 
-          <Card className="shadow-sm">
-            <CardHeader>
-              <CardTitle>Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ActivityPlaceholder />
-            </CardContent>
-          </Card>
+        <div className="lg:pl-8">
+          <div className="border-b pb-3">
+            <h2 className="font-semibold">Activity</h2>
+          </div>
+          <div className="pt-4">
+            <ActivityPlaceholder />
+          </div>
         </div>
       </div>
     </div>

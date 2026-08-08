@@ -21,13 +21,18 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 
-function Logo() {
+function Logo({ inverted = false }: { inverted?: boolean }) {
   return (
     <div className="flex items-center gap-2 px-2 py-1">
-      <div className="flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+      <div
+        className={cn(
+          "flex size-8 items-center justify-center rounded-lg shadow-sm",
+          inverted ? "bg-white/15 text-white" : "bg-primary text-primary-foreground"
+        )}
+      >
         <GraduationCap className="size-4" />
       </div>
-      <span className="text-base font-semibold tracking-tight">EduTrack</span>
+      <span className={cn("text-base font-semibold tracking-tight", inverted && "text-white")}>EduTrack</span>
     </div>
   )
 }
@@ -48,12 +53,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen w-full bg-muted/20">
-      <aside className="hidden w-64 shrink-0 border-r bg-accent/60 md:flex md:flex-col">
-        <div className="border-b border-primary/10 px-4 py-4">
-          <Logo />
+      <aside className="hidden w-64 shrink-0 bg-primary md:flex md:flex-col">
+        <div className="border-b border-white/10 px-4 py-4">
+          <Logo inverted />
         </div>
         <div className="flex-1 overflow-y-auto p-3">
-          <NavLinks role={user.role} />
+          <NavLinks role={user.role} inverted />
         </div>
       </aside>
 
