@@ -138,10 +138,6 @@ function LoginForm() {
               </Button>
             </form>
           </Form>
-
-          <p className="text-center text-xs text-muted-foreground">
-            Demo accounts: admin@edutrack.local · teacher@edutrack.local · student1@edutrack.local
-          </p>
         </div>
       </div>
     </main>
