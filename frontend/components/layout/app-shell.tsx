@@ -8,10 +8,11 @@ import { LogOut, Menu, User as UserIcon } from "lucide-react"
 import { useAuth } from "@/lib/auth/auth-context"
 import { NavLinks } from "@/components/layout/nav-links"
 import { ThemeToggle } from "@/components/features/theme-toggle"
+import { ThemeColorPicker } from "@/components/features/theme-color-picker"
 import { toneClassName, roleTone } from "@/lib/status-styles"
 import { cn, getInitials } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
+import { Sheet, SheetContent, SheetFooter, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -86,6 +87,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <div className="p-3">
               <NavLinks role={user.role} onNavigate={() => setMobileOpen(false)} />
             </div>
+            <SheetFooter className="border-t p-3">
+              <ThemeColorPicker />
+            </SheetFooter>
           </SheetContent>
         </Sheet>
 
@@ -147,6 +151,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         >
           <div className="flex-1 overflow-y-auto p-3">
             <NavLinks role={user.role} collapsed={collapsed} />
+          </div>
+          <div className="border-t p-3">
+            <ThemeColorPicker collapsed={collapsed} />
           </div>
         </aside>
 

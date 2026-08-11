@@ -26,6 +26,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       suppressHydrationWarning
     >
       <body className="min-h-full flex flex-col">
+        <script
+          // Sets the color-theme attribute before first paint, mirroring what next-themes does
+          // internally for dark mode — without this, a saved non-default theme would flash the
+          // default look for a frame before React hydrates and ThemeColorProvider's effect runs.
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{var t=localStorage.getItem('edutrack:color-theme');if(t)document.documentElement.dataset.colorTheme=t;}catch(e){}",
+          }}
+        />
         <Providers>{children}</Providers>
       </body>
     </html>

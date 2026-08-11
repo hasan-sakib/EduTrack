@@ -203,6 +203,59 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Color theme presets — selected via [data-color-theme] on <html>, independent of the
+   light/dark (.dark) mode set by next-themes. Only brand-carrying tokens are overridden;
+   background/foreground/border/muted/status colors stay on the base tokens above for every
+   theme, so a theme switch never affects success/warning/info/destructive meaning. "minimal"
+   needs no block at all — it's the base palette above, unmodified. */
+[data-color-theme="edutrack"] {
+  --primary: oklch(0.55 0.13 195);
+  --primary-foreground: oklch(1 0 0);
+  --accent: oklch(0.95 0.03 195);
+  --accent-foreground: oklch(0.28 0.05 215);
+  --ring: oklch(0.55 0.13 195 / 0.35);
+}
+
+[data-color-theme="edutrack"].dark {
+  --primary: oklch(0.68 0.12 195);
+  --primary-foreground: oklch(0.15 0.03 210);
+  --accent: oklch(0.28 0.04 205);
+  --accent-foreground: oklch(0.9 0.05 195);
+  --ring: oklch(0.68 0.12 195 / 0.35);
+}
+
+[data-color-theme="indigo"] {
+  --primary: oklch(0.511 0.262 276.966);
+  --primary-foreground: oklch(1 0 0);
+  --accent: oklch(0.96 0.02 277);
+  --accent-foreground: oklch(0.32 0.1 277);
+  --ring: oklch(0.511 0.262 276.966 / 0.35);
+}
+
+[data-color-theme="indigo"].dark {
+  --primary: oklch(0.585 0.233 277.117);
+  --primary-foreground: oklch(0.98 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --ring: oklch(0.585 0.233 277.117 / 0.35);
+}
+
+[data-color-theme="slate"] {
+  --primary: oklch(0.32 0.045 235);
+  --primary-foreground: oklch(0.98 0 0);
+  --accent: oklch(0.94 0.02 235);
+  --accent-foreground: oklch(0.28 0.04 235);
+  --ring: oklch(0.32 0.045 235 / 0.35);
+}
+
+[data-color-theme="slate"].dark {
+  --primary: oklch(0.72 0.045 235);
+  --primary-foreground: oklch(0.15 0.02 235);
+  --accent: oklch(0.28 0.03 235);
+  --accent-foreground: oklch(0.92 0.02 235);
+  --ring: oklch(0.72 0.045 235 / 0.35);
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
