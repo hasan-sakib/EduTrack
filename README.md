@@ -43,7 +43,7 @@ This is the fastest way to see the whole system running; it needs nothing instal
 
 ```bash
 git clone https://github.com/hasan-sakib/EduTrack
-cd edutrack
+cd EduTrack
 
 cp .env.example .env
 # Edit .env and set two secrets — there are no safe defaults for these:
