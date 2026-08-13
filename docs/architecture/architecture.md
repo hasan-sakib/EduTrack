@@ -52,7 +52,7 @@ flowchart TD
 
 **Application** defines the ports (`IUserService`, `IAssignmentService`, `ISubmissionService`, `ITeacherAssignmentService`, `IAuthService`, `ICurrentUserService`, `IFileStorageService`, `IUnitOfWork`, `IRepository<T>`) and the request/response DTOs that cross the API boundary. Business rules that don't belong to a single entity (e.g. "a student can only submit to a Published assignment for their own class, before the deadline") live in service implementations here, not in controllers. FluentValidation validators and AutoMapper profiles are colocated per feature.
 
-**Infrastructure** implements the technical adapters that Application depends on as interfaces: JWT issuance/validation (`IAuthService`), local-disk file storage (`IFileStorageService`), password hashing, and Serilog sink configuration.
+**Infrastructure** implements the technical adapters that Application depends on as interfaces: JWT issuance/validation (`IAuthService`), RustFS/S3-compatible file storage (`IFileStorageService`), password hashing, and Serilog sink configuration.
 
 **Persistence** implements `AppDbContext` (EF Core), Fluent API entity configurations carrying constraints/indexes, the generic repository + unit-of-work, migrations, and seed data (roles, a bootstrap Admin, demo classes/subjects for local dev).
 
@@ -96,19 +96,21 @@ flowchart TD
 ```mermaid
 flowchart LR
     subgraph docker-compose.yml
-        pg["postgres<br/>(docker/postgres init scripts)"]
+        pg["postgres<br/>(no init scripts needed — EF migrations own the schema)"]
+        rf["rustfs<br/>(S3-compatible object storage)"]
         be["backend<br/>(backend/Dockerfile)"]
         fe["frontend<br/>(frontend/Dockerfile)"]
         nx["nginx<br/>(docker/nginx conf)"]
     end
     pgdata[("pgdata volume")]
-    uploads[("uploads volume")]
+    rustfsdata[("rustfs-data volume")]
 
     be --> pg
+    be --> rf
     pg --- pgdata
-    be --- uploads
+    rf --- rustfsdata
     nx --> fe
     nx --> be
 ```
 
-`docker/scripts` holds a wait-for-postgres entrypoint wrapper so the backend container retries DB connections until Postgres is ready, then applies pending EF Core migrations and seed data automatically on startup (dev/demo convenience — documented as a `README.md` assumption).
+`docker-compose.yml` gates the backend's startup on Postgres's own healthcheck (`depends_on: postgres: condition: service_healthy`) — no custom wait-for-postgres wrapper needed. Once started, the backend applies pending EF Core migrations and seed data automatically (dev/demo convenience — documented as a `README.md` assumption), and creates its RustFS upload bucket on first file upload if it doesn't already exist.
