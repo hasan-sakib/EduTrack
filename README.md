@@ -42,7 +42,7 @@ See [`docs/architecture/architecture.md`](docs/architecture/architecture.md) for
 This is the fastest way to see the whole system running; it needs nothing installed except Docker (and Docker Compose, which ships with Docker Desktop).
 
 ```bash
-git clone <this-repo-url> edutrack
+git clone https://github.com/hasan-sakib/EduTrack
 cd edutrack
 
 cp .env.example .env
