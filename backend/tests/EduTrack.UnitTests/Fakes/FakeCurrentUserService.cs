@@ -9,4 +9,6 @@ public class FakeCurrentUserService : ICurrentUserService
     public string Role { get; set; } = string.Empty;
     public Guid? ClassId { get; set; }
     public string? IpAddress { get; set; } = "127.0.0.1";
+
+    public Task<Guid?> GetClassIdAsync(CancellationToken ct = default) => Task.FromResult(ClassId);
 }

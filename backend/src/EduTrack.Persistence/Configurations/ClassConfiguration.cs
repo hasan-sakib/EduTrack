@@ -16,10 +16,13 @@ public class ClassConfiguration : IEntityTypeConfiguration<Class>
             .IsRequired()
             .HasMaxLength(128);
 
+        builder.Property(x => x.Section)
+            .HasMaxLength(32);
+
         builder.Property(x => x.Description)
             .HasMaxLength(1024);
 
-        builder.HasIndex(x => x.Name)
+        builder.HasIndex(x => new { x.Name, x.Section })
             .IsUnique();
     }
 }

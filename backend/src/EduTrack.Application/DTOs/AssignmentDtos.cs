@@ -2,6 +2,10 @@ using EduTrack.Domain.Enums;
 
 namespace EduTrack.Application.DTOs;
 
+public record AssignmentAttachmentDto(Guid Id, string FileUrl, string FileName);
+
+public record AssignmentAttachmentRequest(string FileUrl, string FileName);
+
 public record AssignmentDto(
     Guid Id,
     string Title,
@@ -10,7 +14,8 @@ public record AssignmentDto(
     DateTimeOffset DueDate,
     AssignmentStatus Status,
     bool AllowResubmission,
-    string? AttachmentUrl,
+    string? Topic,
+    IReadOnlyList<AssignmentAttachmentDto> Attachments,
     Guid TeacherAssignmentId,
     Guid ClassId,
     string ClassName,
@@ -22,10 +27,23 @@ public record AssignmentDto(
     DateTimeOffset UpdatedAt);
 
 public record CreateAssignmentRequest(
-    Guid TeacherAssignmentId, string Title, string Description, int MaxMarks, DateTimeOffset DueDate, bool AllowResubmission, string? AttachmentUrl = null);
+    Guid TeacherAssignmentId,
+    string Title,
+    string Description,
+    int MaxMarks,
+    DateTimeOffset DueDate,
+    bool AllowResubmission,
+    string? Topic = null,
+    IReadOnlyList<AssignmentAttachmentRequest>? Attachments = null);
 
 public record UpdateAssignmentRequest(
-    string Title, string Description, int MaxMarks, DateTimeOffset DueDate, bool AllowResubmission, string? AttachmentUrl = null);
+    string Title,
+    string Description,
+    int MaxMarks,
+    DateTimeOffset DueDate,
+    bool AllowResubmission,
+    string? Topic = null,
+    IReadOnlyList<AssignmentAttachmentRequest>? Attachments = null);
 
 public record UpdateAssignmentStatusRequest(AssignmentStatus Status);
 

@@ -10,7 +10,9 @@ public class MappingProfile : Profile
     {
         CreateMap<User, UserDto>()
             .ForCtorParam(nameof(UserDto.Role), o => o.MapFrom(s => s.Role.Name))
-            .ForCtorParam(nameof(UserDto.ClassName), o => o.MapFrom(s => s.Class != null ? s.Class.Name : null));
+            .ForCtorParam(nameof(UserDto.ClassName), o => o.MapFrom(s => s.Class != null
+                ? (s.Class.Section == null || s.Class.Section == "" ? s.Class.Name : s.Class.Name + " - " + s.Class.Section)
+                : null));
 
         CreateMap<User, CurrentUserDto>()
             .ForCtorParam(nameof(CurrentUserDto.Role), o => o.MapFrom(s => s.Role.Name));
@@ -22,12 +24,18 @@ public class MappingProfile : Profile
 
         CreateMap<TeacherAssignment, TeacherAssignmentDto>()
             .ForCtorParam(nameof(TeacherAssignmentDto.TeacherName), o => o.MapFrom(s => s.Teacher.FullName))
-            .ForCtorParam(nameof(TeacherAssignmentDto.ClassName), o => o.MapFrom(s => s.Class.Name))
+            .ForCtorParam(nameof(TeacherAssignmentDto.ClassName), o => o.MapFrom(s =>
+                s.Class.Section == null || s.Class.Section == "" ? s.Class.Name : s.Class.Name + " - " + s.Class.Section))
             .ForCtorParam(nameof(TeacherAssignmentDto.SubjectName), o => o.MapFrom(s => s.Subject.Name));
+
+        CreateMap<AssignmentAttachment, AssignmentAttachmentDto>();
 
         CreateMap<Assignment, AssignmentDto>()
             .ForCtorParam(nameof(AssignmentDto.ClassId), o => o.MapFrom(s => s.TeacherAssignment.ClassId))
-            .ForCtorParam(nameof(AssignmentDto.ClassName), o => o.MapFrom(s => s.TeacherAssignment.Class.Name))
+            .ForCtorParam(nameof(AssignmentDto.ClassName), o => o.MapFrom(s =>
+                s.TeacherAssignment.Class.Section == null || s.TeacherAssignment.Class.Section == ""
+                    ? s.TeacherAssignment.Class.Name
+                    : s.TeacherAssignment.Class.Name + " - " + s.TeacherAssignment.Class.Section))
             .ForCtorParam(nameof(AssignmentDto.SubjectId), o => o.MapFrom(s => s.TeacherAssignment.SubjectId))
             .ForCtorParam(nameof(AssignmentDto.SubjectName), o => o.MapFrom(s => s.TeacherAssignment.Subject.Name))
             .ForCtorParam(nameof(AssignmentDto.TeacherId), o => o.MapFrom(s => s.TeacherAssignment.TeacherId))

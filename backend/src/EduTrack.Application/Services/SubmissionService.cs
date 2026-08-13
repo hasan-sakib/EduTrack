@@ -76,7 +76,8 @@ public class SubmissionService : ISubmissionService
             .FirstOrDefaultAsync(a => a.Id == assignmentId, ct)
             ?? throw new NotFoundException(nameof(Assignment), assignmentId);
 
-        if (assignment.Status != AssignmentStatus.Published || assignment.TeacherAssignment.ClassId != _currentUser.ClassId)
+        var classId = await _currentUser.GetClassIdAsync(ct);
+        if (assignment.Status != AssignmentStatus.Published || assignment.TeacherAssignment.ClassId != classId)
         {
             throw new ForbiddenException("This assignment is not available to you.");
         }

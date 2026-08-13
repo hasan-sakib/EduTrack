@@ -25,8 +25,8 @@ public class AssignmentConfiguration : IEntityTypeConfiguration<Assignment>
             .HasConversion<string>()
             .HasMaxLength(20);
 
-        builder.Property(x => x.AttachmentUrl)
-            .HasMaxLength(1024);
+        builder.Property(x => x.Topic)
+            .HasMaxLength(100);
 
         builder.HasIndex(x => new { x.TeacherAssignmentId, x.Status, x.DueDate });
 

@@ -10,6 +10,7 @@ public interface IUnitOfWork
     IRepository<Subject> Subjects { get; }
     IRepository<TeacherAssignment> TeacherAssignments { get; }
     IRepository<Assignment> Assignments { get; }
+    IRepository<AssignmentAttachment> AssignmentAttachments { get; }
     IRepository<Submission> Submissions { get; }
     IRepository<RefreshToken> RefreshTokens { get; }
     IRepository<AuditLog> AuditLogs { get; }

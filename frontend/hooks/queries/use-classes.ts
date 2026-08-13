@@ -1,7 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { apiClient } from "@/lib/api/client"
 import type { PagedQuery, PagedResult } from "@/lib/schemas/common"
-import type { ClassDto, CreateClassFormValues, UpdateClassFormValues } from "@/lib/schemas/classes"
+import type {
+  ClassDto,
+  CreateClassFormValues,
+  StudentSummaryDto,
+  UpdateClassFormValues,
+} from "@/lib/schemas/classes"
 
 const CLASSES_KEY = "classes"
 
@@ -13,6 +18,28 @@ export function useClasses(query: PagedQuery) {
       return response.data
     },
     placeholderData: (previous) => previous,
+  })
+}
+
+export function useClass(id: string) {
+  return useQuery({
+    queryKey: [CLASSES_KEY, id],
+    queryFn: async () => {
+      const response = await apiClient.get<ClassDto>(`/classes/${id}`)
+      return response.data
+    },
+    enabled: !!id,
+  })
+}
+
+export function useClassStudents(id: string, enabled = true) {
+  return useQuery({
+    queryKey: [CLASSES_KEY, id, "students"],
+    queryFn: async () => {
+      const response = await apiClient.get<StudentSummaryDto[]>(`/classes/${id}/students`)
+      return response.data
+    },
+    enabled: !!id && enabled,
   })
 }
 

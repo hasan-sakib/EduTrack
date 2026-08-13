@@ -22,7 +22,7 @@ export function ThemeColorPicker({ collapsed = false }: { collapsed?: boolean })
         <span
           aria-hidden
           className="size-4 shrink-0 rounded-full border border-black/10"
-          style={{ backgroundColor: active.swatch }}
+          style={{ background: active.swatch }}
         />
         {!collapsed && <span className="text-sm">{active.label}</span>}
       </Button>
@@ -58,7 +58,7 @@ export function ThemeColorPicker({ collapsed = false }: { collapsed?: boolean })
               <span
                 aria-hidden
                 className="size-3.5 shrink-0 rounded-full border border-black/10"
-                style={{ backgroundColor: themeOption.swatch }}
+                style={{ background: themeOption.swatch }}
               />
               <span className="flex-1 truncate">{themeOption.label}</span>
               {themeOption.id === colorTheme && <Check className="size-3.5 shrink-0" />}

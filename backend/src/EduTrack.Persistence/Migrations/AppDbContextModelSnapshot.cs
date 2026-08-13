@@ -69,10 +69,6 @@ namespace EduTrack.Persistence.Migrations
                     b.Property<bool>("AllowResubmission")
                         .HasColumnType("boolean");
 
-                    b.Property<string>("AttachmentUrl")
-                        .HasMaxLength(1024)
-                        .HasColumnType("character varying(1024)");
-
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -99,6 +95,10 @@ namespace EduTrack.Persistence.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<string>("Topic")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -107,6 +107,38 @@ namespace EduTrack.Persistence.Migrations
                     b.HasIndex("TeacherAssignmentId", "Status", "DueDate");
 
                     b.ToTable("Assignments", (string)null);
+                });
+
+            modelBuilder.Entity("EduTrack.Domain.Entities.AssignmentAttachment", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AssignmentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("FileUrl")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
+
+                    b.Property<DateTimeOffset>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssignmentId");
+
+                    b.ToTable("AssignmentAttachments", (string)null);
                 });
 
             modelBuilder.Entity("EduTrack.Domain.Entities.AuditLog", b =>
@@ -174,12 +206,16 @@ namespace EduTrack.Persistence.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("character varying(128)");
 
+                    b.Property<string>("Section")
+                        .HasMaxLength(32)
+                        .HasColumnType("character varying(32)");
+
                     b.Property<DateTimeOffset>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
+                    b.HasIndex("Name", "Section")
                         .IsUnique();
 
                     b.ToTable("Classes", (string)null);
@@ -445,6 +481,17 @@ namespace EduTrack.Persistence.Migrations
                     b.Navigation("TeacherAssignment");
                 });
 
+            modelBuilder.Entity("EduTrack.Domain.Entities.AssignmentAttachment", b =>
+                {
+                    b.HasOne("EduTrack.Domain.Entities.Assignment", "Assignment")
+                        .WithMany("Attachments")
+                        .HasForeignKey("AssignmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Assignment");
+                });
+
             modelBuilder.Entity("EduTrack.Domain.Entities.AuditLog", b =>
                 {
                     b.HasOne("EduTrack.Domain.Entities.User", "User")
@@ -539,6 +586,8 @@ namespace EduTrack.Persistence.Migrations
 
             modelBuilder.Entity("EduTrack.Domain.Entities.Assignment", b =>
                 {
+                    b.Navigation("Attachments");
+
                     b.Navigation("Submissions");
                 });
 

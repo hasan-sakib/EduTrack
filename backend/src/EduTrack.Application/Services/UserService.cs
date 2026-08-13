@@ -95,7 +95,8 @@ public class UserService : IUserService
         await _unitOfWork.SaveChangesAsync(ct);
         await _auditLogger.LogAsync("Create", nameof(User), user.Id, ct: ct);
 
-        return new UserDto(user.Id, user.FullName, user.Email, role.Name, studentClass?.Id, studentClass?.Name, user.IsActive, user.CreatedAt);
+        return new UserDto(user.Id, user.FullName, user.Email, role.Name, studentClass?.Id,
+            studentClass is not null ? ClassDisplay.Compose(studentClass.Name, studentClass.Section) : null, user.IsActive, user.CreatedAt);
     }
 
     public async Task<UserDto> UpdateAsync(Guid id, UpdateUserRequest request, CancellationToken ct = default)
@@ -125,7 +126,8 @@ public class UserService : IUserService
         await _unitOfWork.SaveChangesAsync(ct);
         await _auditLogger.LogAsync("Update", nameof(User), user.Id, ct: ct);
 
-        return new UserDto(user.Id, user.FullName, user.Email, role.Name, studentClass?.Id, studentClass?.Name, user.IsActive, user.CreatedAt);
+        return new UserDto(user.Id, user.FullName, user.Email, role.Name, studentClass?.Id,
+            studentClass is not null ? ClassDisplay.Compose(studentClass.Name, studentClass.Section) : null, user.IsActive, user.CreatedAt);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken ct = default)

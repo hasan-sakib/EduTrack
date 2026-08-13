@@ -8,6 +8,7 @@ public class CreateClassRequestValidator : AbstractValidator<CreateClassRequest>
     public CreateClassRequestValidator()
     {
         RuleFor(x => x.Name).NotEmpty().MaximumLength(128);
+        RuleFor(x => x.Section).MaximumLength(32);
         RuleFor(x => x.Description).MaximumLength(1024);
     }
 }
@@ -17,6 +18,7 @@ public class UpdateClassRequestValidator : AbstractValidator<UpdateClassRequest>
     public UpdateClassRequestValidator()
     {
         RuleFor(x => x.Name).NotEmpty().MaximumLength(128);
+        RuleFor(x => x.Section).MaximumLength(32);
         RuleFor(x => x.Description).MaximumLength(1024);
     }
 }

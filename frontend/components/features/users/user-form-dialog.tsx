@@ -16,6 +16,7 @@ import {
 import { ROLES } from "@/lib/schemas/common"
 import { useCreateUser, useUpdateUser } from "@/hooks/queries/use-users"
 import { useAllClasses } from "@/hooks/queries/use-classes"
+import { classDisplayName } from "@/lib/schemas/classes"
 import { getErrorMessage } from "@/lib/api/error"
 import { Button } from "@/components/ui/button"
 import {
@@ -222,7 +223,7 @@ export function UserFormDialog({ open, onOpenChange, userToEdit }: UserFormDialo
                       <SelectContent>
                         {classes?.map((classItem) => (
                           <SelectItem key={classItem.id} value={classItem.id}>
-                            {classItem.name}
+                            {classDisplayName(classItem)}
                           </SelectItem>
                         ))}
                       </SelectContent>

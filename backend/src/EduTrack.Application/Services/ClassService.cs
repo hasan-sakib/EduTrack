@@ -29,7 +29,7 @@ public class ClassService : IClassService
         if (!string.IsNullOrWhiteSpace(query.Search))
         {
             var term = query.Search.Trim().ToLower();
-            q = q.Where(c => c.Name.ToLower().Contains(term));
+            q = q.Where(c => c.Name.ToLower().Contains(term) || (c.Section != null && c.Section.ToLower().Contains(term)));
         }
 
         q = query.SortDir == "desc" ? q.OrderByDescending(c => c.Name) : q.OrderBy(c => c.Name);
@@ -44,20 +44,35 @@ public class ClassService : IClassService
         return _mapper.Map<ClassDto>(entity);
     }
 
-    public async Task<ClassDto> CreateAsync(CreateClassRequest request, CancellationToken ct = default)
+    public async Task<IReadOnlyList<StudentSummaryDto>> GetStudentsAsync(Guid classId, CancellationToken ct = default)
     {
-        var exists = await _unitOfWork.Classes.Query().AnyAsync(c => c.Name == request.Name, ct);
-        if (exists)
+        var classExists = await _unitOfWork.Classes.Query().AnyAsync(c => c.Id == classId, ct);
+        if (!classExists)
         {
-            throw new BusinessRuleException($"A class named '{request.Name}' already exists.");
+            throw new NotFoundException(nameof(Class), classId);
         }
 
-        var entity = new Class { Name = request.Name, Description = request.Description, IsActive = true };
+        return await _unitOfWork.Users.Query()
+            .Where(u => u.ClassId == classId)
+            .OrderBy(u => u.Email)
+            .Select(u => new StudentSummaryDto(u.Id, u.Email))
+            .ToListAsync(ct);
+    }
+
+    public async Task<ClassDto> CreateAsync(CreateClassRequest request, CancellationToken ct = default)
+    {
+        var exists = await _unitOfWork.Classes.Query().AnyAsync(c => c.Name == request.Name && c.Section == request.Section, ct);
+        if (exists)
+        {
+            throw new BusinessRuleException($"A class named '{ClassDisplay.Compose(request.Name, request.Section)}' already exists.");
+        }
+
+        var entity = new Class { Name = request.Name, Section = request.Section, Description = request.Description, IsActive = true };
         await _unitOfWork.Classes.AddAsync(entity, ct);
         await _unitOfWork.SaveChangesAsync(ct);
         await _auditLogger.LogAsync("Create", nameof(Class), entity.Id, ct: ct);
 
-        return new ClassDto(entity.Id, entity.Name, entity.Description, entity.IsActive, 0, entity.CreatedAt);
+        return new ClassDto(entity.Id, entity.Name, entity.Section, entity.Description, entity.IsActive, 0, entity.CreatedAt);
     }
 
     public async Task<ClassDto> UpdateAsync(Guid id, UpdateClassRequest request, CancellationToken ct = default)
@@ -65,6 +80,7 @@ public class ClassService : IClassService
         var entity = await _unitOfWork.Classes.GetByIdAsync(id, ct) ?? throw new NotFoundException(nameof(Class), id);
 
         entity.Name = request.Name;
+        entity.Section = request.Section;
         entity.Description = request.Description;
         entity.IsActive = request.IsActive;
 
@@ -73,7 +89,7 @@ public class ClassService : IClassService
         await _auditLogger.LogAsync("Update", nameof(Class), entity.Id, ct: ct);
 
         var studentCount = await _unitOfWork.Users.Query().CountAsync(u => u.ClassId == entity.Id, ct);
-        return new ClassDto(entity.Id, entity.Name, entity.Description, entity.IsActive, studentCount, entity.CreatedAt);
+        return new ClassDto(entity.Id, entity.Name, entity.Section, entity.Description, entity.IsActive, studentCount, entity.CreatedAt);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken ct = default)

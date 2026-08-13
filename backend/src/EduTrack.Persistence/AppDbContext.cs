@@ -16,6 +16,7 @@ public class AppDbContext : DbContext
     public DbSet<Subject> Subjects => Set<Subject>();
     public DbSet<TeacherAssignment> TeacherAssignments => Set<TeacherAssignment>();
     public DbSet<Assignment> Assignments => Set<Assignment>();
+    public DbSet<AssignmentAttachment> AssignmentAttachments => Set<AssignmentAttachment>();
     public DbSet<Submission> Submissions => Set<Submission>();
     public DbSet<RefreshToken> RefreshTokens => Set<RefreshToken>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();

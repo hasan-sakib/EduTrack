@@ -14,6 +14,12 @@ export const assignmentStatusLabels: Record<AssignmentStatusValue, string> = {
   [AssignmentStatus.Closed]: "Closed",
 }
 
+export interface AssignmentAttachmentDto {
+  id: string
+  fileUrl: string
+  fileName: string
+}
+
 export interface AssignmentDto {
   id: string
   title: string
@@ -22,7 +28,8 @@ export interface AssignmentDto {
   dueDate: string
   status: AssignmentStatusValue
   allowResubmission: boolean
-  attachmentUrl: string | null
+  topic: string | null
+  attachments: AssignmentAttachmentDto[]
   teacherAssignmentId: string
   classId: string
   className: string
@@ -34,6 +41,11 @@ export interface AssignmentDto {
   updatedAt: string
 }
 
+const attachmentSchema = z.object({
+  fileUrl: z.string(),
+  fileName: z.string(),
+})
+
 export const createAssignmentSchema = z.object({
   teacherAssignmentId: z.string().min(1, "Class & subject is required"),
   title: z.string().min(1, "Title is required").max(256),
@@ -41,7 +53,8 @@ export const createAssignmentSchema = z.object({
   maxMarks: z.coerce.number().int().positive("Max marks must be greater than 0"),
   dueDate: z.string().min(1, "Due date is required"),
   allowResubmission: z.boolean(),
-  attachmentUrl: z.string().nullable().optional(),
+  topic: z.string().max(100, "Topic must be 100 characters or fewer").nullable().optional(),
+  attachments: z.array(attachmentSchema).default([]),
 })
 
 export type CreateAssignmentFormValues = z.infer<typeof createAssignmentSchema>
@@ -52,7 +65,8 @@ export const updateAssignmentSchema = z.object({
   maxMarks: z.coerce.number().int().positive("Max marks must be greater than 0"),
   dueDate: z.string().min(1, "Due date is required"),
   allowResubmission: z.boolean(),
-  attachmentUrl: z.string().nullable().optional(),
+  topic: z.string().max(100, "Topic must be 100 characters or fewer").nullable().optional(),
+  attachments: z.array(attachmentSchema).default([]),
 })
 
 export type UpdateAssignmentFormValues = z.infer<typeof updateAssignmentSchema>

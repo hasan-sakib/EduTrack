@@ -6,10 +6,15 @@ namespace EduTrack.Api.Services;
 public class CurrentUserService : ICurrentUserService
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CurrentUserService(IHttpContextAccessor httpContextAccessor)
+    private bool _classIdFetched;
+    private Guid? _cachedClassId;
+
+    public CurrentUserService(IHttpContextAccessor httpContextAccessor, IUnitOfWork unitOfWork)
     {
         _httpContextAccessor = httpContextAccessor;
+        _unitOfWork = unitOfWork;
     }
 
     private ClaimsPrincipal? User => _httpContextAccessor.HttpContext?.User;
@@ -20,7 +25,15 @@ public class CurrentUserService : ICurrentUserService
 
     public string Role => User?.FindFirstValue(ClaimTypes.Role) ?? string.Empty;
 
-    public Guid? ClassId => Guid.TryParse(User?.FindFirstValue("classId"), out var id) ? id : null;
+    public async Task<Guid?> GetClassIdAsync(CancellationToken ct = default)
+    {
+        if (_classIdFetched) return _cachedClassId;
+
+        var user = IsAuthenticated ? await _unitOfWork.Users.GetByIdAsync(UserId, ct) : null;
+        _cachedClassId = user?.ClassId;
+        _classIdFetched = true;
+        return _cachedClassId;
+    }
 
     public string? IpAddress => _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString();
 }

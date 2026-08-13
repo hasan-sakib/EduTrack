@@ -16,6 +16,7 @@ import {
 } from "@/lib/schemas/teacher-assignments"
 import { useCreateTeacherAssignment } from "@/hooks/queries/use-teacher-assignments"
 import { useAllClasses } from "@/hooks/queries/use-classes"
+import { classDisplayName } from "@/lib/schemas/classes"
 import { useAllSubjects } from "@/hooks/queries/use-subjects"
 import { getErrorMessage } from "@/lib/api/error"
 import { Button } from "@/components/ui/button"
@@ -132,7 +133,7 @@ export function TeacherAssignmentDialog({ open, onOpenChange }: TeacherAssignmen
                     <SelectContent>
                       {classes?.map((classItem) => (
                         <SelectItem key={classItem.id} value={classItem.id}>
-                          {classItem.name}
+                          {classDisplayName(classItem)}
                         </SelectItem>
                       ))}
                     </SelectContent>

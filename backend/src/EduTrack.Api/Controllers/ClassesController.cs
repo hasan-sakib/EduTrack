@@ -32,6 +32,10 @@ public class ClassesController : ControllerBase
     public async Task<IActionResult> GetById(Guid id, CancellationToken ct) =>
         Ok(await _classService.GetByIdAsync(id, ct));
 
+    [HttpGet("{id:guid}/students")]
+    public async Task<IActionResult> GetStudents(Guid id, CancellationToken ct) =>
+        Ok(await _classService.GetStudentsAsync(id, ct));
+
     [HttpPost]
     [Authorize(Roles = RoleName.Admin)]
     public async Task<IActionResult> Create(CreateClassRequest request, CancellationToken ct)

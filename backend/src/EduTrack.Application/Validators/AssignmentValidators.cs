@@ -12,6 +12,7 @@ public class CreateAssignmentRequestValidator : AbstractValidator<CreateAssignme
         RuleFor(x => x.Description).NotEmpty();
         RuleFor(x => x.MaxMarks).GreaterThan(0);
         RuleFor(x => x.DueDate).GreaterThan(DateTimeOffset.UtcNow).WithMessage("Due date must be in the future.");
+        RuleFor(x => x.Topic).MaximumLength(100);
     }
 }
 
@@ -23,6 +24,7 @@ public class UpdateAssignmentRequestValidator : AbstractValidator<UpdateAssignme
         RuleFor(x => x.Description).NotEmpty();
         RuleFor(x => x.MaxMarks).GreaterThan(0);
         RuleFor(x => x.DueDate).NotEmpty();
+        RuleFor(x => x.Topic).MaximumLength(100);
     }
 }
 

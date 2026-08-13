@@ -42,13 +42,14 @@ export function ClassFormDialog({ open, onOpenChange, classToEdit }: ClassFormDi
 
   const form = useForm<CreateClassFormValues & { isActive?: boolean }>({
     resolver: zodResolver(isEdit ? updateClassSchema : createClassSchema),
-    defaultValues: { name: "", description: "", isActive: true },
+    defaultValues: { name: "", section: "", description: "", isActive: true },
   })
 
   React.useEffect(() => {
     if (open) {
       form.reset({
         name: classToEdit?.name ?? "",
+        section: classToEdit?.section ?? "",
         description: classToEdit?.description ?? "",
         isActive: classToEdit?.isActive ?? true,
       })
@@ -56,12 +57,13 @@ export function ClassFormDialog({ open, onOpenChange, classToEdit }: ClassFormDi
   }, [open, classToEdit, form])
 
   async function onSubmit(values: CreateClassFormValues & { isActive?: boolean }) {
+    const payload = { ...values, section: values.section?.trim() || null }
     try {
       if (isEdit) {
-        await updateClass.mutateAsync(values as UpdateClassFormValues)
+        await updateClass.mutateAsync(payload as UpdateClassFormValues)
         toast.success("Class updated")
       } else {
-        await createClass.mutateAsync(values)
+        await createClass.mutateAsync(payload)
         toast.success("Class created")
       }
       onOpenChange(false)
@@ -83,19 +85,34 @@ export function ClassFormDialog({ open, onOpenChange, classToEdit }: ClassFormDi
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Grade 10 - A" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            <div className="grid grid-cols-3 gap-3">
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem className="col-span-2">
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Grade 10" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="section"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Section</FormLabel>
+                    <FormControl>
+                      <Input placeholder="A" {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
             <FormField
               control={form.control}
               name="description"

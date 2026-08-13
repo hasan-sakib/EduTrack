@@ -27,7 +27,7 @@ public class AssignmentService : IAssignmentService
 
     public async Task<PagedResult<AssignmentDto>> GetAllAsync(AssignmentQuery query, CancellationToken ct = default)
     {
-        var q = ScopedQuery();
+        var q = await ScopedQueryAsync(ct);
 
         if (query.Status is not null) q = q.Where(a => a.Status == query.Status);
         if (query.ClassId is not null) q = q.Where(a => a.TeacherAssignment.ClassId == query.ClassId);
@@ -46,7 +46,7 @@ public class AssignmentService : IAssignmentService
     public async Task<AssignmentDto> GetByIdAsync(Guid id, CancellationToken ct = default)
     {
         var assignment = await LoadWithIncludesAsync(id, ct) ?? throw new NotFoundException(nameof(Assignment), id);
-        EnsureCanView(assignment);
+        await EnsureCanViewAsync(assignment, ct);
         return _mapper.Map<AssignmentDto>(assignment);
     }
 
@@ -70,15 +70,29 @@ public class AssignmentService : IAssignmentService
             MaxMarks = request.MaxMarks,
             DueDate = request.DueDate,
             AllowResubmission = request.AllowResubmission,
-            AttachmentUrl = request.AttachmentUrl,
-            Status = AssignmentStatus.Draft
+            Topic = request.Topic,
+            // Published immediately — no separate draft/publish step; students in the class
+            // should see it as soon as it's created.
+            Status = AssignmentStatus.Published
         };
 
         await _unitOfWork.Assignments.AddAsync(assignment, ct);
+
+        foreach (var attachment in request.Attachments ?? [])
+        {
+            await _unitOfWork.AssignmentAttachments.AddAsync(new AssignmentAttachment
+            {
+                AssignmentId = assignment.Id,
+                FileUrl = attachment.FileUrl,
+                FileName = attachment.FileName,
+            }, ct);
+        }
+
         await _unitOfWork.SaveChangesAsync(ct);
         await _auditLogger.LogAsync("Create", nameof(Assignment), assignment.Id, ct: ct);
 
-        return ToDto(assignment, teacherAssignment);
+        var created = await LoadWithIncludesAsync(assignment.Id, ct);
+        return ToDto(created!, teacherAssignment);
     }
 
     public async Task<AssignmentDto> UpdateAsync(Guid id, UpdateAssignmentRequest request, CancellationToken ct = default)
@@ -92,9 +106,28 @@ public class AssignmentService : IAssignmentService
         tracked.MaxMarks = request.MaxMarks;
         tracked.DueDate = request.DueDate;
         tracked.AllowResubmission = request.AllowResubmission;
-        tracked.AttachmentUrl = request.AttachmentUrl;
+        tracked.Topic = request.Topic;
 
         _unitOfWork.Assignments.Update(tracked);
+
+        var existingAttachments = await _unitOfWork.AssignmentAttachments.Query()
+            .Where(a => a.AssignmentId == id)
+            .ToListAsync(ct);
+        foreach (var existing in existingAttachments)
+        {
+            _unitOfWork.AssignmentAttachments.Remove(existing);
+        }
+
+        foreach (var attachment in request.Attachments ?? [])
+        {
+            await _unitOfWork.AssignmentAttachments.AddAsync(new AssignmentAttachment
+            {
+                AssignmentId = id,
+                FileUrl = attachment.FileUrl,
+                FileName = attachment.FileName,
+            }, ct);
+        }
+
         await _unitOfWork.SaveChangesAsync(ct);
         await _auditLogger.LogAsync("Update", nameof(Assignment), assignment.Id, ct: ct);
 
@@ -134,19 +167,26 @@ public class AssignmentService : IAssignmentService
         await _auditLogger.LogAsync("Delete", nameof(Assignment), assignment.Id, ct: ct);
     }
 
-    private IQueryable<Assignment> ScopedQuery()
+    private async Task<IQueryable<Assignment>> ScopedQueryAsync(CancellationToken ct)
     {
         var q = _unitOfWork.Assignments.Query()
             .Include(a => a.TeacherAssignment).ThenInclude(t => t.Class)
             .Include(a => a.TeacherAssignment).ThenInclude(t => t.Subject)
-            .Include(a => a.TeacherAssignment).ThenInclude(t => t.Teacher);
+            .Include(a => a.TeacherAssignment).ThenInclude(t => t.Teacher)
+            .Include(a => a.Attachments);
 
-        return _currentUser.Role switch
+        if (_currentUser.Role == RoleName.Teacher)
         {
-            RoleName.Teacher => q.Where(a => a.TeacherAssignment.TeacherId == _currentUser.UserId),
-            RoleName.Student => q.Where(a => a.Status == AssignmentStatus.Published && a.TeacherAssignment.ClassId == _currentUser.ClassId),
-            _ => q
-        };
+            return q.Where(a => a.TeacherAssignment.TeacherId == _currentUser.UserId);
+        }
+
+        if (_currentUser.Role == RoleName.Student)
+        {
+            var classId = await _currentUser.GetClassIdAsync(ct);
+            return q.Where(a => a.Status == AssignmentStatus.Published && a.TeacherAssignment.ClassId == classId);
+        }
+
+        return q;
     }
 
     private Task<Assignment?> LoadWithIncludesAsync(Guid id, CancellationToken ct) =>
@@ -154,19 +194,23 @@ public class AssignmentService : IAssignmentService
             .Include(a => a.TeacherAssignment).ThenInclude(t => t.Class)
             .Include(a => a.TeacherAssignment).ThenInclude(t => t.Subject)
             .Include(a => a.TeacherAssignment).ThenInclude(t => t.Teacher)
+            .Include(a => a.Attachments)
             .FirstOrDefaultAsync(a => a.Id == id, ct);
 
-    private void EnsureCanView(Assignment assignment)
+    private async Task EnsureCanViewAsync(Assignment assignment, CancellationToken ct)
     {
         if (_currentUser.Role == RoleName.Teacher && assignment.TeacherAssignment.TeacherId != _currentUser.UserId)
         {
             throw new ForbiddenException("You do not have access to this assignment.");
         }
 
-        if (_currentUser.Role == RoleName.Student &&
-            (assignment.Status != AssignmentStatus.Published || assignment.TeacherAssignment.ClassId != _currentUser.ClassId))
+        if (_currentUser.Role == RoleName.Student)
         {
-            throw new ForbiddenException("This assignment is not available to you.");
+            var classId = await _currentUser.GetClassIdAsync(ct);
+            if (assignment.Status != AssignmentStatus.Published || assignment.TeacherAssignment.ClassId != classId)
+            {
+                throw new ForbiddenException("This assignment is not available to you.");
+            }
         }
     }
 
@@ -179,7 +223,8 @@ public class AssignmentService : IAssignmentService
     }
 
     private static AssignmentDto ToDto(Assignment a, TeacherAssignment ta) => new(
-        a.Id, a.Title, a.Description, a.MaxMarks, a.DueDate, a.Status, a.AllowResubmission, a.AttachmentUrl,
-        ta.Id, ta.ClassId, ta.Class.Name, ta.SubjectId, ta.Subject.Name, ta.TeacherId, ta.Teacher.FullName,
+        a.Id, a.Title, a.Description, a.MaxMarks, a.DueDate, a.Status, a.AllowResubmission, a.Topic,
+        a.Attachments.Select(x => new AssignmentAttachmentDto(x.Id, x.FileUrl, x.FileName)).ToList(),
+        ta.Id, ta.ClassId, ClassDisplay.Compose(ta.Class.Name, ta.Class.Section), ta.SubjectId, ta.Subject.Name, ta.TeacherId, ta.Teacher.FullName,
         a.CreatedAt, a.UpdatedAt);
 }

@@ -58,13 +58,6 @@ function AssignmentActions({
 }) {
   const updateStatus = useUpdateAssignmentStatus(assignment.id)
 
-  function handlePublish() {
-    updateStatus.mutate(AssignmentStatus.Published, {
-      onSuccess: () => toast.success("Assignment published"),
-      onError: (error) => toast.error(getErrorMessage(error)),
-    })
-  }
-
   function handleClose() {
     updateStatus.mutate(AssignmentStatus.Closed, {
       onSuccess: () => toast.success("Assignment closed"),
@@ -82,9 +75,6 @@ function AssignmentActions({
           <Link href={`/assignments/${assignment.id}`}>View</Link>
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => onEdit(assignment)}>Edit</DropdownMenuItem>
-        {assignment.status === AssignmentStatus.Draft && (
-          <DropdownMenuItem onSelect={handlePublish}>Publish</DropdownMenuItem>
-        )}
         {assignment.status === AssignmentStatus.Published && (
           <DropdownMenuItem onSelect={handleClose}>Close</DropdownMenuItem>
         )}
@@ -115,6 +105,7 @@ function AssignmentRow({
         <Link href={`/assignments/${assignment.id}`} className="hover:underline">
           {assignment.title}
         </Link>
+        {assignment.topic && <p className="text-xs font-normal text-muted-foreground">{assignment.topic}</p>}
       </TableCell>
       <TableCell className="hidden md:table-cell">{assignment.className}</TableCell>
       <TableCell className="hidden md:table-cell">{assignment.subjectName}</TableCell>
@@ -182,7 +173,10 @@ function AssignmentCard({
             >
               {assignment.title}
             </Link>
-            <p className="mt-1 truncate text-xs text-muted-foreground">{assignment.subjectName}</p>
+            <p className="mt-1 truncate text-xs text-muted-foreground">
+              {assignment.subjectName}
+              {assignment.topic ? ` · ${assignment.topic}` : ""}
+            </p>
           </div>
           {isTeacher ? (
             <AssignmentActions

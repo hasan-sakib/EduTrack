@@ -1,6 +1,6 @@
 import { apiClient } from "@/lib/api/client"
 
-/** Uploads a file and returns the storage key to persist on an entity (e.g. attachmentUrl, fileUrl). */
+/** Uploads a file and returns the storage key to persist on an entity (e.g. an attachment's fileUrl). */
 export async function uploadFile(file: File): Promise<string> {
   const formData = new FormData()
   formData.append("file", file)

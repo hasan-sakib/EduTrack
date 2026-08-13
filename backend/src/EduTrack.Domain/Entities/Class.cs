@@ -5,6 +5,7 @@ namespace EduTrack.Domain.Entities;
 public class Class : BaseEntity
 {
     public string Name { get; set; } = default!;
+    public string? Section { get; set; }
     public string? Description { get; set; }
     public bool IsActive { get; set; } = true;
 

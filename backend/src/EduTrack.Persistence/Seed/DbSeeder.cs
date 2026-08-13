@@ -76,8 +76,8 @@ public static class DbSeeder
         var teacherRole = await context.Roles.SingleAsync(x => x.Name == RoleName.Teacher);
         var studentRole = await context.Roles.SingleAsync(x => x.Name == RoleName.Student);
 
-        var classA = new Class { Name = "Grade 10 - A", Description = "Grade 10, Section A", IsActive = true };
-        var classB = new Class { Name = "Grade 10 - B", Description = "Grade 10, Section B", IsActive = true };
+        var classA = new Class { Name = "Grade 10", Section = "A", Description = "Grade 10, Section A", IsActive = true };
+        var classB = new Class { Name = "Grade 10", Section = "B", Description = "Grade 10, Section B", IsActive = true };
         context.Classes.AddRange(classA, classB);
 
         var mathSubject = new Subject { Name = "Mathematics", Code = "MATH101", IsActive = true };

@@ -14,7 +14,8 @@ public class Assignment : BaseEntity
     public DateTimeOffset DueDate { get; set; }
     public AssignmentStatus Status { get; set; } = AssignmentStatus.Draft;
     public bool AllowResubmission { get; set; }
-    public string? AttachmentUrl { get; set; }
+    public string? Topic { get; set; }
 
+    public ICollection<AssignmentAttachment> Attachments { get; set; } = new List<AssignmentAttachment>();
     public ICollection<Submission> Submissions { get; set; } = new List<Submission>();
 }

@@ -5,7 +5,7 @@ import Link from "next/link"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
-import { ArrowLeft, Check, Download, Loader2 } from "lucide-react"
+import { ArrowLeft, Check, Download, Loader2, Paperclip } from "lucide-react"
 import { format } from "date-fns"
 import { toast } from "sonner"
 import { motion } from "framer-motion"
@@ -17,7 +17,7 @@ import { getErrorMessage } from "@/lib/api/error"
 import { downloadFile } from "@/lib/api/files"
 import { getDeadlineInfo } from "@/lib/deadline"
 import { assignmentStatusTone, submissionStatusTone } from "@/lib/status-styles"
-import { fadeInUp } from "@/lib/motion"
+import { fadeInUp, staggerContainer } from "@/lib/motion"
 import { cn } from "@/lib/utils"
 import { AssignmentStatus, assignmentStatusLabels } from "@/lib/schemas/assignments"
 import {
@@ -35,9 +35,8 @@ import { AssignmentFormDialog } from "@/components/features/assignments/assignme
 import { FileUploadField } from "@/components/features/file-upload-field"
 
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Separator } from "@/components/ui/separator"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Textarea } from "@/components/ui/textarea"
 
@@ -85,6 +84,7 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
         breadcrumbs={[{ label: "Assignments", href: "/assignments" }, { label: assignment.title }]}
         action={
           <div className="flex flex-wrap items-center gap-2">
+            {assignment.topic && <Badge variant="outline">{assignment.topic}</Badge>}
             <StatusBadge tone={assignmentStatusTone[assignment.status]}>
               {assignmentStatusLabels[assignment.status]}
             </StatusBadge>
@@ -103,51 +103,50 @@ export default function AssignmentDetailPage({ params }: { params: Promise<{ id:
         }
       />
 
-      <motion.div initial="hidden" animate="visible" variants={fadeInUp}>
-        <Card className="shadow-sm">
-          <CardContent className="space-y-4 pt-6">
-            <p className="whitespace-pre-wrap text-sm leading-relaxed">{assignment.description}</p>
+      <motion.div initial="hidden" animate="visible" variants={fadeInUp} className="space-y-4 border-b pb-6">
+        <p className="whitespace-pre-wrap text-sm leading-relaxed">{assignment.description}</p>
 
-            <Separator />
+        <div className="grid grid-cols-2 gap-4 border-t pt-4 text-sm sm:grid-cols-4">
+          <div>
+            <p className="text-muted-foreground">Teacher</p>
+            <p className="font-medium">{assignment.teacherName}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">Due Date</p>
+            <p className="font-medium">{format(new Date(assignment.dueDate), "PPp")}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">Max Marks</p>
+            <p className="font-medium">{assignment.maxMarks}</p>
+          </div>
+          <div>
+            <p className="text-muted-foreground">Allow Resubmission</p>
+            <p className="font-medium">{assignment.allowResubmission ? "Yes" : "No"}</p>
+          </div>
+        </div>
 
-            <div className="grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
-              <div>
-                <p className="text-muted-foreground">Teacher</p>
-                <p className="font-medium">{assignment.teacherName}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Due Date</p>
-                <p className="font-medium">{format(new Date(assignment.dueDate), "PPp")}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Max Marks</p>
-                <p className="font-medium">{assignment.maxMarks}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Allow Resubmission</p>
-                <p className="font-medium">{assignment.allowResubmission ? "Yes" : "No"}</p>
-              </div>
-            </div>
-
-            {assignment.attachmentUrl && (
-              <>
-                <Separator />
-                <div>
-                  <p className="mb-1.5 text-sm text-muted-foreground">Attachment</p>
+        {assignment.attachments.length > 0 && (
+          <div className="border-t pt-4">
+            <p className="mb-2 text-sm text-muted-foreground">
+              Attachment{assignment.attachments.length > 1 ? "s" : ""}
+            </p>
+            <motion.div initial="hidden" animate="visible" variants={staggerContainer} className="flex flex-wrap gap-2">
+              {assignment.attachments.map((attachment) => (
+                <motion.div key={attachment.id} variants={fadeInUp}>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() => downloadFile(assignment.attachmentUrl!, `${assignment.title}-attachment`)}
+                    onClick={() => downloadFile(attachment.fileUrl, attachment.fileName)}
                   >
-                    <Download className="size-4" />
-                    Download attachment
+                    <Paperclip className="size-4" />
+                    {attachment.fileName}
                   </Button>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        )}
       </motion.div>
 
       {isStudent && assignment.status === AssignmentStatus.Published && (
@@ -275,127 +274,121 @@ function StudentSubmissionPanel({
   const deadlineMissedNoSubmission = !submission && deadlinePassed
 
   return (
-    <motion.div initial="hidden" animate="visible" variants={fadeInUp} transition={{ delay: 0.1 }}>
-      <Card className="mt-6 shadow-sm">
-        <CardHeader>
-          <CardTitle>Your Submission</CardTitle>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <Skeleton className="h-24 w-full" />
-          ) : (
-            <>
-              {!deadlineMissedNoSubmission && <SubmissionTimeline submission={submission} />}
+    <motion.div initial="hidden" animate="visible" variants={fadeInUp} transition={{ delay: 0.1 }} className="pt-6">
+      <h2 className="mb-3 font-semibold">Your Submission</h2>
+      {isLoading ? (
+        <Skeleton className="h-24 w-full" />
+      ) : (
+        <>
+          {!deadlineMissedNoSubmission && <SubmissionTimeline submission={submission} />}
 
-              {isGraded && submission ? (
-                <div className="space-y-4 text-sm">
-                  <div className="rounded-lg border bg-muted/30 p-4">
-                    <p className="text-muted-foreground">Marks</p>
-                    <p className="text-2xl font-semibold tracking-tight">
-                      {submission.marks ?? "—"} <span className="text-base font-normal text-muted-foreground">/ {maxMarks}</span>
-                    </p>
-                  </div>
-                  <div>
-                    <p className="mb-1 text-muted-foreground">Feedback</p>
-                    <p className="whitespace-pre-wrap rounded-lg border bg-background p-3">
-                      {submission.feedback || "No feedback provided."}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-muted-foreground">Status</span>
-                    <StatusBadge tone={submissionStatusTone[submission.status]}>
-                      {submissionStatusLabels[submission.status]}
-                    </StatusBadge>
-                  </div>
-                  {submission.gradedByName && (
-                    <p className="text-muted-foreground">
-                      Graded by {submission.gradedByName}
-                      {submission.gradedAt ? ` on ${format(new Date(submission.gradedAt), "PPp")}` : ""}
-                    </p>
+          {isGraded && submission ? (
+            <div className="space-y-4 text-sm">
+              <div className="rounded-lg border bg-muted/30 p-4">
+                <p className="text-muted-foreground">Marks</p>
+                <p className="text-2xl font-semibold tracking-tight">
+                  {submission.marks ?? "—"} <span className="text-base font-normal text-muted-foreground">/ {maxMarks}</span>
+                </p>
+              </div>
+              <div>
+                <p className="mb-1 text-muted-foreground">Feedback</p>
+                <p className="whitespace-pre-wrap rounded-lg border bg-background p-3">
+                  {submission.feedback || "No feedback provided."}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-muted-foreground">Status</span>
+                <StatusBadge tone={submissionStatusTone[submission.status]}>
+                  {submissionStatusLabels[submission.status]}
+                </StatusBadge>
+              </div>
+              {submission.gradedByName && (
+                <p className="text-muted-foreground">
+                  Graded by {submission.gradedByName}
+                  {submission.gradedAt ? ` on ${format(new Date(submission.gradedAt), "PPp")}` : ""}
+                </p>
+              )}
+              {submission.fileUrl && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => downloadFile(submission.fileUrl!, "your-submission")}
+                >
+                  <Download className="size-4" />
+                  Download your submitted file
+                </Button>
+              )}
+            </div>
+          ) : deadlineMissedNoSubmission ? (
+            <p className="text-sm text-muted-foreground">The deadline for this assignment has passed.</p>
+          ) : showFreshForm || canResubmit ? (
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="content"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Your answer</FormLabel>
+                      <FormControl>
+                        <Textarea rows={6} placeholder="Write your answer here..." {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                  {submission.fileUrl && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => downloadFile(submission.fileUrl!, "your-submission")}
-                    >
-                      <Download className="size-4" />
-                      Download your submitted file
-                    </Button>
+                />
+                <FormField
+                  control={form.control}
+                  name="fileUrl"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Attach a file (optional)</FormLabel>
+                      <FormControl>
+                        <FileUploadField
+                          value={field.value}
+                          onChange={(key) => field.onChange(key ?? "")}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
                   )}
-                </div>
-              ) : deadlineMissedNoSubmission ? (
-                <p className="text-sm text-muted-foreground">The deadline for this assignment has passed.</p>
-              ) : showFreshForm || canResubmit ? (
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                    <FormField
-                      control={form.control}
-                      name="content"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Your answer</FormLabel>
-                          <FormControl>
-                            <Textarea rows={6} placeholder="Write your answer here..." {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <FormField
-                      control={form.control}
-                      name="fileUrl"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Attach a file (optional)</FormLabel>
-                          <FormControl>
-                            <FileUploadField
-                              value={field.value}
-                              onChange={(key) => field.onChange(key ?? "")}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                    <Button type="submit" disabled={submitMutation.isPending}>
-                      {submitMutation.isPending && <Loader2 className="animate-spin" />}
-                      {canResubmit ? "Resubmit" : "Submit"}
-                    </Button>
-                  </form>
-                </Form>
-              ) : submission ? (
-                <div className="space-y-2 text-sm">
-                  <p>
-                    Submitted on {format(new Date(submission.submittedAt), "PPp")}
-                    {submission.isLate ? " (late)" : ""}.
-                  </p>
-                  <p className="text-muted-foreground">
-                    Your submission is awaiting grading
-                    {!allowResubmission
-                      ? "; resubmission is not allowed for this assignment."
-                      : deadlinePassed
-                        ? "; the due date has passed so it can no longer be changed."
-                        : "."}
-                  </p>
-                  {submission.fileUrl && (
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => downloadFile(submission.fileUrl!, "your-submission")}
-                    >
-                      <Download className="size-4" />
-                      Download your submitted file
-                    </Button>
-                  )}
-                </div>
-              ) : null}
-            </>
-          )}
-        </CardContent>
-      </Card>
+                />
+                <Button type="submit" disabled={submitMutation.isPending}>
+                  {submitMutation.isPending && <Loader2 className="animate-spin" />}
+                  {canResubmit ? "Resubmit" : "Submit"}
+                </Button>
+              </form>
+            </Form>
+          ) : submission ? (
+            <div className="space-y-2 text-sm">
+              <p>
+                Submitted on {format(new Date(submission.submittedAt), "PPp")}
+                {submission.isLate ? " (late)" : ""}.
+              </p>
+              <p className="text-muted-foreground">
+                Your submission is awaiting grading
+                {!allowResubmission
+                  ? "; resubmission is not allowed for this assignment."
+                  : deadlinePassed
+                    ? "; the due date has passed so it can no longer be changed."
+                    : "."}
+              </p>
+              {submission.fileUrl && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => downloadFile(submission.fileUrl!, "your-submission")}
+                >
+                  <Download className="size-4" />
+                  Download your submitted file
+                </Button>
+              )}
+            </div>
+          ) : null}
+        </>
+      )}
     </motion.div>
   )
 }

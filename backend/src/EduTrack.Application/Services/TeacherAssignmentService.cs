@@ -77,7 +77,8 @@ public class TeacherAssignmentService : ITeacherAssignmentService
         await _unitOfWork.SaveChangesAsync(ct);
         await _auditLogger.LogAsync("Create", nameof(TeacherAssignment), entity.Id, ct: ct);
 
-        return new TeacherAssignmentDto(entity.Id, teacher.Id, teacher.FullName, @class.Id, @class.Name, subject.Id, subject.Name, entity.CreatedAt);
+        return new TeacherAssignmentDto(entity.Id, teacher.Id, teacher.FullName, @class.Id,
+            ClassDisplay.Compose(@class.Name, @class.Section), subject.Id, subject.Name, entity.CreatedAt);
     }
 
     public async Task DeleteAsync(Guid id, CancellationToken ct = default)

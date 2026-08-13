@@ -17,6 +17,7 @@ public class UnitOfWork : IUnitOfWork
         Subjects = new Repository<Subject>(_context);
         TeacherAssignments = new Repository<TeacherAssignment>(_context);
         Assignments = new Repository<Assignment>(_context);
+        AssignmentAttachments = new Repository<AssignmentAttachment>(_context);
         Submissions = new Repository<Submission>(_context);
         RefreshTokens = new Repository<RefreshToken>(_context);
         AuditLogs = new Repository<AuditLog>(_context);
@@ -29,6 +30,7 @@ public class UnitOfWork : IUnitOfWork
     public IRepository<Subject> Subjects { get; }
     public IRepository<TeacherAssignment> TeacherAssignments { get; }
     public IRepository<Assignment> Assignments { get; }
+    public IRepository<AssignmentAttachment> AssignmentAttachments { get; }
     public IRepository<Submission> Submissions { get; }
     public IRepository<RefreshToken> RefreshTokens { get; }
     public IRepository<AuditLog> AuditLogs { get; }

@@ -204,16 +204,59 @@
 }
 
 /* Color theme presets — selected via [data-color-theme] on <html>, independent of the
-   light/dark (.dark) mode set by next-themes. Only brand-carrying tokens are overridden;
-   background/foreground/border/muted/status colors stay on the base tokens above for every
-   theme, so a theme switch never affects success/warning/info/destructive meaning. "minimal"
-   needs no block at all — it's the base palette above, unmodified. */
+   light/dark (.dark) mode set by next-themes. Brand-carrying tokens (primary/accent/ring) are
+   overridden per theme; background/foreground/border/muted/status colors stay on the base
+   tokens above for main content, so a theme switch never affects success/warning/info/
+   destructive meaning. "mono-ink" needs no block at all — it's the base palette above,
+   unmodified. Every theme also sets --sidebar-* tokens, which .themed-nav (below) remaps onto
+   the ordinary --background/--foreground/--accent/--primary/--border vars for its subtree —
+   that's what lets both navbars (top header + side nav) carry the theme's color. */
+[data-color-theme="spring-pastel"] {
+  --primary: oklch(0.78 0.11 152);
+  --primary-foreground: oklch(0.28 0.06 152);
+  --accent: oklch(0.95 0.04 350);
+  --accent-foreground: oklch(0.35 0.08 350);
+  --ring: oklch(0.78 0.11 152 / 0.35);
+  --sidebar: oklch(0.96 0.03 145);
+  --sidebar-foreground: oklch(0.32 0.06 150);
+  --sidebar-primary: oklch(0.78 0.11 152);
+  --sidebar-primary-foreground: oklch(0.28 0.06 152);
+  --sidebar-accent: oklch(0.9 0.05 145);
+  --sidebar-accent-foreground: oklch(0.3 0.06 150);
+  --sidebar-border: oklch(0.88 0.04 150);
+  --sidebar-ring: oklch(0.78 0.11 152 / 0.35);
+}
+
+[data-color-theme="spring-pastel"].dark {
+  --primary: oklch(0.75 0.12 152);
+  --primary-foreground: oklch(0.18 0.03 152);
+  --accent: oklch(0.3 0.05 350);
+  --accent-foreground: oklch(0.92 0.05 350);
+  --ring: oklch(0.75 0.12 152 / 0.35);
+  --sidebar: oklch(0.22 0.04 150);
+  --sidebar-foreground: oklch(0.88 0.05 150);
+  --sidebar-primary: oklch(0.75 0.12 152);
+  --sidebar-primary-foreground: oklch(0.18 0.03 152);
+  --sidebar-accent: oklch(0.3 0.05 150);
+  --sidebar-accent-foreground: oklch(0.9 0.05 150);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.75 0.12 152 / 0.35);
+}
+
 [data-color-theme="edutrack"] {
   --primary: oklch(0.55 0.13 195);
   --primary-foreground: oklch(1 0 0);
   --accent: oklch(0.95 0.03 195);
   --accent-foreground: oklch(0.28 0.05 215);
   --ring: oklch(0.55 0.13 195 / 0.35);
+  --sidebar: oklch(0.93 0.05 195);
+  --sidebar-foreground: oklch(0.28 0.06 200);
+  --sidebar-primary: oklch(0.55 0.13 195);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.87 0.06 195);
+  --sidebar-accent-foreground: oklch(0.26 0.06 200);
+  --sidebar-border: oklch(0.84 0.05 195);
+  --sidebar-ring: oklch(0.55 0.13 195 / 0.35);
 }
 
 [data-color-theme="edutrack"].dark {
@@ -222,38 +265,166 @@
   --accent: oklch(0.28 0.04 205);
   --accent-foreground: oklch(0.9 0.05 195);
   --ring: oklch(0.68 0.12 195 / 0.35);
+  --sidebar: oklch(0.2 0.04 200);
+  --sidebar-foreground: oklch(0.88 0.05 195);
+  --sidebar-primary: oklch(0.68 0.12 195);
+  --sidebar-primary-foreground: oklch(0.15 0.03 210);
+  --sidebar-accent: oklch(0.28 0.05 200);
+  --sidebar-accent-foreground: oklch(0.9 0.05 195);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.68 0.12 195 / 0.35);
 }
 
-[data-color-theme="indigo"] {
-  --primary: oklch(0.511 0.262 276.966);
+/* "Multi color" — the navbar itself carries a rainbow gradient (see .themed-nav below);
+   sidebar-* here only supplies readable white-on-gradient text/hover/active tones. */
+[data-color-theme="multi"] {
+  --primary: oklch(0.55 0.23 300);
   --primary-foreground: oklch(1 0 0);
-  --accent: oklch(0.96 0.02 277);
-  --accent-foreground: oklch(0.32 0.1 277);
-  --ring: oklch(0.511 0.262 276.966 / 0.35);
+  --accent: oklch(0.95 0.04 300);
+  --accent-foreground: oklch(0.32 0.1 300);
+  --ring: oklch(0.55 0.23 300 / 0.35);
+  --sidebar: oklch(0.55 0.2 280);
+  --sidebar-foreground: oklch(0.99 0 0);
+  --sidebar-primary: oklch(1 0 0 / 0.22);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(1 0 0 / 0.14);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 0.18);
+  --sidebar-ring: oklch(1 0 0 / 0.4);
 }
 
-[data-color-theme="indigo"].dark {
-  --primary: oklch(0.585 0.233 277.117);
-  --primary-foreground: oklch(0.98 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --ring: oklch(0.585 0.233 277.117 / 0.35);
+[data-color-theme="multi"].dark {
+  --primary: oklch(0.62 0.22 300);
+  --primary-foreground: oklch(1 0 0);
+  --accent: oklch(0.28 0.05 300);
+  --accent-foreground: oklch(0.9 0.06 300);
+  --ring: oklch(0.62 0.22 300 / 0.35);
+  --sidebar: oklch(0.4 0.16 280);
+  --sidebar-foreground: oklch(0.99 0 0);
+  --sidebar-primary: oklch(1 0 0 / 0.22);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(1 0 0 / 0.14);
+  --sidebar-accent-foreground: oklch(1 0 0);
+  --sidebar-border: oklch(1 0 0 / 0.18);
+  --sidebar-ring: oklch(1 0 0 / 0.4);
 }
 
-[data-color-theme="slate"] {
-  --primary: oklch(0.32 0.045 235);
-  --primary-foreground: oklch(0.98 0 0);
-  --accent: oklch(0.94 0.02 235);
-  --accent-foreground: oklch(0.28 0.04 235);
-  --ring: oklch(0.32 0.045 235 / 0.35);
+[data-color-theme="multi"] .themed-nav {
+  background-image: linear-gradient(120deg, oklch(0.62 0.19 25), oklch(0.68 0.17 95), oklch(0.6 0.18 195), oklch(0.58 0.22 300));
 }
 
-[data-color-theme="slate"].dark {
-  --primary: oklch(0.72 0.045 235);
-  --primary-foreground: oklch(0.15 0.02 235);
-  --accent: oklch(0.28 0.03 235);
-  --accent-foreground: oklch(0.92 0.02 235);
-  --ring: oklch(0.72 0.045 235 / 0.35);
+[data-color-theme="multi"].dark .themed-nav {
+  background-image: linear-gradient(120deg, oklch(0.45 0.16 25), oklch(0.5 0.15 95), oklch(0.42 0.15 195), oklch(0.42 0.18 300));
+}
+
+[data-color-theme="sky-blue"] {
+  --primary: oklch(0.62 0.15 230);
+  --primary-foreground: oklch(1 0 0);
+  --accent: oklch(0.95 0.03 230);
+  --accent-foreground: oklch(0.3 0.07 230);
+  --ring: oklch(0.62 0.15 230 / 0.35);
+  --sidebar: oklch(0.92 0.05 230);
+  --sidebar-foreground: oklch(0.28 0.07 232);
+  --sidebar-primary: oklch(0.62 0.15 230);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.86 0.06 230);
+  --sidebar-accent-foreground: oklch(0.26 0.07 232);
+  --sidebar-border: oklch(0.82 0.06 230);
+  --sidebar-ring: oklch(0.62 0.15 230 / 0.35);
+}
+
+[data-color-theme="sky-blue"].dark {
+  --primary: oklch(0.7 0.13 230);
+  --primary-foreground: oklch(0.15 0.03 230);
+  --accent: oklch(0.28 0.05 230);
+  --accent-foreground: oklch(0.9 0.05 230);
+  --ring: oklch(0.7 0.13 230 / 0.35);
+  --sidebar: oklch(0.2 0.05 232);
+  --sidebar-foreground: oklch(0.88 0.05 230);
+  --sidebar-primary: oklch(0.7 0.13 230);
+  --sidebar-primary-foreground: oklch(0.15 0.03 230);
+  --sidebar-accent: oklch(0.28 0.06 232);
+  --sidebar-accent-foreground: oklch(0.9 0.05 230);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.7 0.13 230 / 0.35);
+}
+
+[data-color-theme="green"] {
+  --primary: oklch(0.55 0.16 145);
+  --primary-foreground: oklch(1 0 0);
+  --accent: oklch(0.95 0.04 145);
+  --accent-foreground: oklch(0.28 0.07 145);
+  --ring: oklch(0.55 0.16 145 / 0.35);
+  --sidebar: oklch(0.91 0.06 145);
+  --sidebar-foreground: oklch(0.26 0.07 145);
+  --sidebar-primary: oklch(0.55 0.16 145);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.85 0.07 145);
+  --sidebar-accent-foreground: oklch(0.24 0.07 145);
+  --sidebar-border: oklch(0.8 0.06 145);
+  --sidebar-ring: oklch(0.55 0.16 145 / 0.35);
+}
+
+[data-color-theme="green"].dark {
+  --primary: oklch(0.68 0.15 145);
+  --primary-foreground: oklch(0.15 0.03 145);
+  --accent: oklch(0.28 0.05 145);
+  --accent-foreground: oklch(0.9 0.05 145);
+  --ring: oklch(0.68 0.15 145 / 0.35);
+  --sidebar: oklch(0.19 0.05 145);
+  --sidebar-foreground: oklch(0.87 0.06 145);
+  --sidebar-primary: oklch(0.68 0.15 145);
+  --sidebar-primary-foreground: oklch(0.15 0.03 145);
+  --sidebar-accent: oklch(0.27 0.06 145);
+  --sidebar-accent-foreground: oklch(0.9 0.05 145);
+  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-ring: oklch(0.68 0.15 145 / 0.35);
+}
+
+/* "White" / "Black" force a fixed navbar color that ignores the light/dark toggle entirely —
+   the .dark block below repeats the same values on purpose, so switching light/dark never
+   changes the navbar while one of these two themes is active. */
+[data-color-theme="white"],
+[data-color-theme="white"].dark {
+  --sidebar: oklch(1 0 0);
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.145 0 0);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --sidebar-accent: oklch(0.96 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.9 0 0);
+  --sidebar-ring: oklch(0.145 0 0 / 0.3);
+}
+
+[data-color-theme="black"],
+[data-color-theme="black"].dark {
+  --sidebar: oklch(0.145 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.985 0 0);
+  --sidebar-primary-foreground: oklch(0.145 0 0);
+  --sidebar-accent: oklch(0.25 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(1 0 0 / 12%);
+  --sidebar-ring: oklch(0.985 0 0 / 0.3);
+}
+
+/* Both navbars (top header + side nav, see app-shell.tsx) carry this class. Scoping these vars
+   here — rather than editing every nav child component — means any descendant using the
+   ordinary bg-background/text-foreground/bg-accent/bg-primary/border utilities automatically
+   picks up the active theme's --sidebar-* tones instead, with no per-component changes. Popovers
+   and dropdown menus render in a portal outside this subtree, so they're unaffected and keep the
+   app's normal surface styling. */
+.themed-nav {
+  --background: var(--sidebar);
+  --foreground: var(--sidebar-foreground);
+  --muted: var(--sidebar-accent);
+  --muted-foreground: var(--sidebar-foreground);
+  --accent: var(--sidebar-accent);
+  --accent-foreground: var(--sidebar-accent-foreground);
+  --primary: var(--sidebar-primary);
+  --primary-foreground: var(--sidebar-primary-foreground);
+  --border: var(--sidebar-border);
+  --ring: var(--sidebar-ring);
 }
 
 @layer base {
