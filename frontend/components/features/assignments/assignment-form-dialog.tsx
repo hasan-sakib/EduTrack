@@ -90,6 +90,7 @@ export function AssignmentFormDialog({ open, onOpenChange, assignmentToEdit }: A
       allowResubmission: false,
       topic: "",
       attachments: [],
+      publish: false,
     },
   })
 
@@ -104,11 +105,12 @@ export function AssignmentFormDialog({ open, onOpenChange, assignmentToEdit }: A
         allowResubmission: assignmentToEdit?.allowResubmission ?? false,
         topic: assignmentToEdit?.topic ?? "",
         attachments: assignmentToEdit?.attachments.map((a) => ({ fileUrl: a.fileUrl, fileName: a.fileName })) ?? [],
+        publish: false,
       })
     }
   }, [open, assignmentToEdit, form])
 
-  async function onSubmit(values: FormValues) {
+  async function onSubmit(values: FormValues, publish = false) {
     try {
       if (isEdit) {
         const updateValues: UpdateAssignmentFormValues = {
@@ -123,8 +125,8 @@ export function AssignmentFormDialog({ open, onOpenChange, assignmentToEdit }: A
         await updateAssignment.mutateAsync(updateValues)
         toast.success("Assignment updated")
       } else {
-        await createAssignment.mutateAsync({ ...values, topic: values.topic?.trim() || null })
-        toast.success("Assignment created and published to the class")
+        await createAssignment.mutateAsync({ ...values, topic: values.topic?.trim() || null, publish })
+        toast.success(publish ? "Assignment created and published to the class" : "Assignment saved as draft")
       }
       onOpenChange(false)
     } catch (error) {
@@ -146,7 +148,7 @@ export function AssignmentFormDialog({ open, onOpenChange, assignmentToEdit }: A
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit((values) => onSubmit(values, true))} className="space-y-4">
             <div className="grid max-h-[65vh] gap-6 overflow-y-auto pr-1 sm:grid-cols-3">
               {/* Main column: title, instructions, attachments */}
               <div className="space-y-4 sm:col-span-2">
@@ -284,9 +286,24 @@ export function AssignmentFormDialog({ open, onOpenChange, assignmentToEdit }: A
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              {!isEdit && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={isSubmitting}
+                  onClick={form.handleSubmit((values) => onSubmit(values, false))}
+                >
+                  {isSubmitting && <Loader2 className="animate-spin" />}
+                  Save as draft
+                </Button>
+              )}
+              <Button
+                type="button"
+                disabled={isSubmitting}
+                onClick={form.handleSubmit((values) => onSubmit(values, true))}
+              >
                 {isSubmitting && <Loader2 className="animate-spin" />}
-                {isEdit ? "Save changes" : "Create assignment"}
+                {isEdit ? "Save changes" : "Publish"}
               </Button>
             </DialogFooter>
           </form>

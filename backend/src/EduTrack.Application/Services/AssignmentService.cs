@@ -71,9 +71,8 @@ public class AssignmentService : IAssignmentService
             DueDate = request.DueDate,
             AllowResubmission = request.AllowResubmission,
             Topic = request.Topic,
-            // Published immediately — no separate draft/publish step; students in the class
-            // should see it as soon as it's created.
-            Status = AssignmentStatus.Published
+            // Assignments are created as Draft unless the caller opts to publish immediately.
+            Status = request.Publish ? AssignmentStatus.Published : AssignmentStatus.Draft
         };
 
         await _unitOfWork.Assignments.AddAsync(assignment, ct);

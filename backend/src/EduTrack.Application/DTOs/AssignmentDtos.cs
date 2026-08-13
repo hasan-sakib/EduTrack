@@ -34,7 +34,8 @@ public record CreateAssignmentRequest(
     DateTimeOffset DueDate,
     bool AllowResubmission,
     string? Topic = null,
-    IReadOnlyList<AssignmentAttachmentRequest>? Attachments = null);
+    IReadOnlyList<AssignmentAttachmentRequest>? Attachments = null,
+    bool Publish = false);
 
 public record UpdateAssignmentRequest(
     string Title,

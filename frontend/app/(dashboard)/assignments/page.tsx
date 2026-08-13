@@ -58,6 +58,13 @@ function AssignmentActions({
 }) {
   const updateStatus = useUpdateAssignmentStatus(assignment.id)
 
+  function handlePublish() {
+    updateStatus.mutate(AssignmentStatus.Published, {
+      onSuccess: () => toast.success("Assignment published"),
+      onError: (error) => toast.error(getErrorMessage(error)),
+    })
+  }
+
   function handleClose() {
     updateStatus.mutate(AssignmentStatus.Closed, {
       onSuccess: () => toast.success("Assignment closed"),
@@ -75,6 +82,9 @@ function AssignmentActions({
           <Link href={`/assignments/${assignment.id}`}>View</Link>
         </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => onEdit(assignment)}>Edit</DropdownMenuItem>
+        {assignment.status === AssignmentStatus.Draft && (
+          <DropdownMenuItem onSelect={handlePublish}>Publish</DropdownMenuItem>
+        )}
         {assignment.status === AssignmentStatus.Published && (
           <DropdownMenuItem onSelect={handleClose}>Close</DropdownMenuItem>
         )}

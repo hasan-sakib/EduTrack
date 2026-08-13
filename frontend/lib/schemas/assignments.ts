@@ -55,6 +55,7 @@ export const createAssignmentSchema = z.object({
   allowResubmission: z.boolean(),
   topic: z.string().max(100, "Topic must be 100 characters or fewer").nullable().optional(),
   attachments: z.array(attachmentSchema).default([]),
+  publish: z.boolean().default(false),
 })
 
 export type CreateAssignmentFormValues = z.infer<typeof createAssignmentSchema>
